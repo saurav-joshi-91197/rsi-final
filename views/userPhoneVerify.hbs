@@ -26,6 +26,7 @@
       color: goldenrod;
       border: none;
     }
+
     @media screen and (max-width: 800px) {
   .mypad{
        padding-left: 10%;
@@ -34,12 +35,11 @@
        height: 50vh;
   }
 
-
   .mylogin {
     padding: 0;
     height: 50vh;
   }
-  }
+}
   </style>
 </head>
 <body>
@@ -58,11 +58,11 @@
                 <div class="well color">
                   <div id="myTabContent" class="tab-content color">
                     <div class="tab-pane active in" id="login">
-                      <form class="form-horizontal" action='/myotp' method="POST">
+                      <form class="form-horizontal" action='/phoneVerify' method="POST">
                         <fieldset>   
                           <div class="control-group">
-                            <label class="control-label"  for="rsiid">Enter The OTP</label>
-                             <input type="text" style="background-color:black; border-color: goldenrod;color:goldenrod;" class="form-control" name="rsiotp">
+                            <label class="control-label" style="background-color:black; border-color: goldenrod;color:goldenrod;"  for="rsiid">Enter The Mobile</label>
+                             <input type="text" style="background-color:black; border-color: goldenrod;color:goldenrod;" class="form-control" name="mobNo">
                             </div>    
                           <div class="control-group">
                             <div class="controls">

@@ -45,7 +45,7 @@ const authenticate = (user, mobile, pass) => {
 
 const updatePass = (user, newPass, callback) => {
   admin.database().ref('UserSignIn/'+user + '/pass').set(newPass);
-  callback('index.hbs');
+  callback('/home');
 }
 
   module.exports.idVerify = idVerify;
