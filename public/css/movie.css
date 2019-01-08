@@ -13,6 +13,10 @@
     
 }
 
+ul>li> a:hover > .glyphicon{
+  color: orange;
+}
+
 
 @media screen and (max-width: 800px) {
   .ctgr img {

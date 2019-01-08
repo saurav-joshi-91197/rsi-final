@@ -1,13 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
 const admin = require("firebase-admin");
 const hbs = require('hbs');
+const flash = require('connect-flash');
+const app = express();
 const auth=require("./auth.js")
 const serviceAccount = require("./sk.json");
 const sendOTP = require('./sendMsg.js');
 let otp,mob,user;
-
 
 function generateOTP() {
   var digits = '0123456789';
@@ -18,6 +18,8 @@ function generateOTP() {
   return OTP;
 }
 
+// ============================================= Flash ====================================
+  app.use(flash());
 // ============================================= Middleware ===============================
 
 app.use(bodyParser.json());
@@ -37,14 +39,14 @@ app.use(express.static('./public'));
 //===============================================GET======================================
 
 app.get('/', function (req, res) {
-  res.render('idLogin.hbs');
+  res.render('idLogin.hbs', { messages: req.flash('invalidID') });
 });
 
 app.get('/requestOTP', (req, res)=>{
   sess = req.session;
   if(sess.rsiid)
   {
-    res.render('userPhoneVerify.hbs');
+    res.render('userPhoneVerify.hbs', {messages: req.flash('invalidMobNo')});
   }
   else
   {
@@ -57,6 +59,8 @@ app.get('/home',function(req,res)
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
+    console.log(sess.rsiid);
+    console.log(sess.mobNo);
     res.render('home.hbs');
   }
   else
@@ -68,7 +72,7 @@ app.get('/home',function(req,res)
 app.get('/userLogin', (req, res) => {
   sess = req.session;
   if(sess.rsiid)
-  {res.render('userLogin.hbs');}
+  {res.render('userLogin.hbs', {messages:req.flash('invalidUser')});}
   else
   {res.redirect('/');}
 });
@@ -77,7 +81,7 @@ app.get('/sendOTP', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    res.render('sendOTP.hbs');
+    res.render('sendOTP.hbs', {messages: req.flash('invalidOTP')});
   }
   else{
     res.redirect('/requestOTP');
@@ -88,7 +92,7 @@ app.get('/changePassword', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo && sess.otp)
   {
-    res.redirect('/home');
+    res.render('changePassword.hbs', {messages: req.flash('unequalPassword')});
   }
   else
   {
@@ -100,7 +104,7 @@ app.get('/contact', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    res.render('../public/contact.html');
+    res.sendFile(__dirname+'/public/contact.html');
   }
   else
   {
@@ -112,7 +116,7 @@ app.get('/history', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    res.render('../public/history.html');
+    res.sendFile(__dirname+'/public/history.html');
   }
   else
   {
@@ -120,11 +124,11 @@ app.get('/history', (req, res) => {
   }
 });
 
-app.get('/movie', (req, res) => {
+app.get('/movies', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    res.render('../public/movie.html');
+    res.sendFile(__dirname+'/public/movie.html');
   }
   else
   {
@@ -136,7 +140,7 @@ app.get('/layout', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    res.render('layout.html');
+    res.sendFile(__dirname+'/public/seatlayout.html');
   }
   else
   {
@@ -144,6 +148,15 @@ app.get('/layout', (req, res) => {
   }
 });
 
+app.get('/logout',function(req,res){
+  req.session.destroy(function(err) {
+    if(err) {
+      console.log(err);
+    } else {
+      res.redirect('/');
+    }
+  });
+});
 
 //============================================POST=========================================
 
@@ -157,7 +170,8 @@ app.post('/phoneVerify', function (req, res) {
     sess.mobNo = mobNo;
     res.redirect('/sendOTP');
   }, () => {
-    console.log('error in otp module');
+    req.flash('invalidMobNo', 'Invalid Mobile Number! Please Try Again!!!');
+    res.redirect('/requestOTP');
   });
 })
 
@@ -169,7 +183,11 @@ app.post('/changePasswordVerify', function (req, res) {
       auth.updatePass(user, newPass, (filename)=>{
       res.redirect(filename);
     });
-
+  }
+  else
+  {
+    req.flash('unequalPassword', 'Password Don\'t Match!!!');
+    res.redirect('/changePassword');
   }
 });
 
@@ -179,6 +197,11 @@ app.post('/OTPVerify', function (req, res) {
   {
     sess.otp = req.body.otp;
     res.redirect('/changePassword');
+  }
+  else
+  {
+    req.flash('invalidOTP', 'Invalid OTP!!!');
+    res.redirect('/sendOTP');
   }
 });
 
@@ -190,7 +213,8 @@ app.post('/idVerify',function(req,res){
      sess.rsiid = req.body.rsiid;
      res.redirect('/userLogin');
    }, ()=>{
-     console.log('error in verifying ID');
+     req.flash('invalidID', 'Invalid RSI-ID! Please Try Again!');
+     res.redirect('/');
    });
 });
 
@@ -203,7 +227,8 @@ app.post('/userVerify',function(req,res){
      sess.mobNo = mobNo;
      res.redirect('/home');
    }, ()=>{
-     console.log('error in mobile number authentication');
+     req.flash('invalidUser','Invalid Number Or Password!!!');
+     res.redirect('/userLogin');
    }); 
 });
 

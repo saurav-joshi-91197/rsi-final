@@ -9,7 +9,22 @@
 
 
 }
+ul>li> a:hover > .glyphicon{
+    color: orange;
+}
 
+.ctgr img {
+    display:block;
+    position:relative;
+    -webkit-transition:all .4s linear;
+    transition:all .4s linear;
+    }
+
+    #demo:hover img {
+        -ms-transform:scale(1.1);
+        -webkit-transform:scale(1.2);
+        transform:scale(1.2);
+        }
 .navbar {
     
     margin-bottom: 0;
@@ -39,8 +54,8 @@
     margin: 4px 2px 4px 2px;
     opacity: 1;
     height: 35vh;
-    margin-left: 25px;
-    width: 85%;
+    /*margin-left: 25px;
+    width: 85%;*/
     /* height: 35vh; */
 }
 

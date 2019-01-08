@@ -191,6 +191,11 @@ a {
     position: relative;
 }
 
+ul>li> a:hover > .glyphicon{
+    color: orange;
+}
+
+
 /* Position Relative */
 
 .pos-absolute {
