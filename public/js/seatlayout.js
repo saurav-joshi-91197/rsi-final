@@ -10,7 +10,11 @@ for(k=0; k<358; k++){
 }
 
 function onLoadFunc(){
-    // $('body').off('click','**');
+    
+    var x;
+    for(x=0; x<358; x++){
+        $("."+x).css('pointer-events', 'none');
+    }
     var arrResult = [];
     var uid = firebase.database().ref('Movies/').orderByChild('date');
     uid.on('value',function(snapshot){
@@ -21,7 +25,10 @@ function onLoadFunc(){
         def.on('value',function(snapshot){
             snapshot.forEach(childSnapshot=>{
                 if(childSnapshot.val()==="R"){
-                    $('.'+childSnapshot.key).css({"background":"blue"});
+                    $('.'+childSnapshot.key).css({"background":"#FFA500"});
+                    $('.'+childSnapshot.key).css('pointer-events', 'none');
+                }else{
+                    $('.'+childSnapshot.key).css('pointer-events', 'auto');
                 }
             });
         });
@@ -36,9 +43,6 @@ $('.cinema-seats .seat').on('click', function() {
     }else{
         $(this).toggleClass('active');
         var text = $(this).text();
-        // arr[i]= text;
-        // //window.alert(arr[i]);
-        // i = i+1;
         if(map[text]===0){
             map[text]=1;
             count1 = count1 + 1;
@@ -82,6 +86,3 @@ function updateDB(){
         window.alert('success');
     }
 }
-
-
-

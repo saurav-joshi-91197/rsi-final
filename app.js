@@ -136,6 +136,22 @@ app.get('/movies', (req, res) => {
   }
 });
 
+app.get('/dependents', (req, res) => {
+  sess = req.session;
+  if(sess.rsiid && sess.mobNo){
+    auth.getTotalPrice()
+    .then((obj) => {
+      console.log(obj.Gp, obj.Mp, obj.Dp);
+      res.render('dependents.hbs', obj);
+    }, () => {
+      res.redirect('/movies');
+    });
+  }
+  else{
+    res.redirect('/');
+  }
+});
+
 app.get('/layout', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
