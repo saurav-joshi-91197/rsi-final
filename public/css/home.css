@@ -54,15 +54,16 @@ ul>li> a:hover > .glyphicon{
     margin: 4px 2px 4px 2px;
     opacity: 1;
     height: 35vh;
-    /*margin-left: 25px;
+    margin-left: 25px;
     width: 85%;*/
     /* height: 35vh; */
 }
 
 @media screen and (max-width: 800px) {
   .ctgr img {
-       height: 12vh;
-       width: 60%;
+       height: 15vw;
+       width: 50%;
+       margin-left: 25%;
   }
 }
 
