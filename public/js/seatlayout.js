@@ -1,8 +1,8 @@
 window.onload = onLoadFunc();
 
-var arr = [];
-var i=0;
-
+var count1 = 0;
+var count2 = 0;
+var user = "A-011";
 var map = {};
 var k;
 for(k=0; k<358; k++){
@@ -10,6 +10,7 @@ for(k=0; k<358; k++){
 }
 
 function onLoadFunc(){
+    // $('body').off('click','**');
     var arrResult = [];
     var uid = firebase.database().ref('Movies/').orderByChild('date');
     uid.on('value',function(snapshot){
@@ -35,13 +36,15 @@ $('.cinema-seats .seat').on('click', function() {
     }else{
         $(this).toggleClass('active');
         var text = $(this).text();
-        arr[i]= text;
-        //window.alert(arr[i]);
-        i = i+1;
+        // arr[i]= text;
+        // //window.alert(arr[i]);
+        // i = i+1;
         if(map[text]===0){
             map[text]=1;
+            count1 = count1 + 1;
         }else{
             map[text]=0;
+            count1 = count1 - 1;
         }
     }
 });
@@ -52,21 +55,33 @@ function updateDB(){
     uid.on('value',function(snapshot){
         snapshot.forEach(childSnapshot => {
             arrResult.push(childSnapshot.key);
-            //window.alert(childSnapshot.key);
-        });
-        // var j;
-        // for(j=0; j<arr.length; j++){
-        //     firebase.database().ref('Movies/'+arrResult[0]+'/hall/status/'+arr[j]).set("R");
-        // }
-        var j;
+        });        
+    });
+    var j;
+    for(j=0; j<358; j++){
+        if(map[j]===1){
+            var def = firebase.database().ref('Movies/'+arrResult[0]+'/hall/status/'+j);
+            def.on('value',function(snapshot){
+                if(snapshot.val()==="A"){
+                    count2 = count2 + 1;
+                }
+            });
+        }
+    }
+    // window.alert(count1);
+    // window.alert(count2);
+    if(count2<count1){
+        window.alert('seat already booked you are late');
+    }
+    if(count2===count1){
         for(j=0; j<358; j++){
             if(map[j]===1){
                 firebase.database().ref('Movies/'+arrResult[0]+'/hall/status/'+j).set("R");
             }
         }
-    });
+        window.alert('success');
+    }
 }
-
 
 
 

@@ -41,7 +41,8 @@ ul>li> a:hover > .glyphicon{
     padding: 10px;
     padding-top: 0px;
     margin-top: 0px;
-    margin-bottom: 5px;
+    /* margin-bottom: 5px; */
+
 }
 
 .ctgr * {
@@ -61,9 +62,12 @@ ul>li> a:hover > .glyphicon{
 
 @media screen and (max-width: 800px) {
   .ctgr img {
-       height: 15vw;
-       width: 50%;
-       margin-left: 25%;
+       height: 20vw;
+       width: 60%;
+       margin-left: 20%;
+  }
+  .ctgr {
+      margin-bottom: 1vh;
   }
 }
 
