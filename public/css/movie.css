@@ -12,13 +12,18 @@
     height: 54vw
     
 }
+.container h3{
+  font-weight: bold;
+  font-size: 30px;
+  color: goldenrod;
+}
 
 ul>li> a:hover > .glyphicon{
   color: orange;
 }
 
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
   .ctgr img {
     height: 12vh;
   }
@@ -30,7 +35,8 @@ ul>li> a:hover > .glyphicon{
     }
 }
 .container{
-  margin-left: 51px;
+  margin-left: 2%;
+  margin-right: 2%;
   margin-top: 51px;
 }
 .navbar {

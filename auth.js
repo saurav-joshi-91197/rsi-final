@@ -1,10 +1,17 @@
 var admin = require("firebase-admin");
-var serviceAccount = require("./sk.json");
+var serviceAccount = require("./ss.json");
 
 admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://rsi-project-656a3.firebaseio.com"
-  });
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://rsi-ait.firebaseio.com"
+});
+
+/*
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://rsi-project-656a3.firebaseio.com"
+});
+*/
 
 const idVerify = (user, callback) => {
     var uid = admin.database().ref('UserSignIn/'+user);
@@ -49,30 +56,75 @@ const updatePass = (user, newPass, callback) => {
 }
 
 // ========================= Get Total Price ======================================
-let getTotalPrice = () => {
+let getTotalPrice = (rsiId) => {
   let guestPrice;
   let membersPrice;
   let dependentPrice;
-  let settings = admin.database().ref('Settings/');
-
-  return new Promise((resolve, reject) => {settings.on('value', function(snapshot) {
-    if(snapshot.val().guePrice === null || snapshot.val().memPrice === null || snapshot.val().memPrice === null){
-        reject();
-      }
-    else{
-        guestPrice = snapshot.val().guePrice ;
-        membersPrice = snapshot.val().memPrice;
-        dependentPrice = snapshot.val().memPrice;
-        console.log('in auth.js' + guestPrice, membersPrice, dependentPrice);
+  let dependentCount;
+  let flag=0;
+  let settings = admin.database().ref();
+  return new Promise((resolve, reject) => {settings.on('value', function(snapshot)
+  {
+    snapshot.forEach(childSnapshot=>
+      {
+        if(childSnapshot.key==='Settings')
+        {
+          var prices=admin.database().ref('Settings');
+          prices.on('value',snapshot=>
+          {
+            guestPrice=snapshot.val().guePrice;
+            membersPrice=snapshot.val().memPrice;
+            dependentPrice=snapshot.val().memPrice;
+          })
+        }
+        if(childSnapshot.key==='DepCount')
+        {
+          console.log(rsiId);
+          var dep=admin.database().ref('DepCount/'+rsiId+'/');
+          dep.on('value',snapshot=>
+          {
+            dependentCount=snapshot.val().depCount;
+          })
+        }
+      })
+      if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
+      {
         let obj = {
           Gp: guestPrice,
           Mp: membersPrice,
-          Dp: dependentPrice
+          Dp: dependentPrice,
+          Dc: dependentCount
         };
         resolve(obj);
       }
+      else
+      {
+        reject();
+      }
+
+  }
+)})
+}
+
+// ============================= Get Movies =======================================
+let getMovies = () => {
+  let movies = admin.database().ref('Movies/');
+  movies.orderByChild('date');
+  let movieList = [" "," "," "," "," "," "," ",String("")];
+  let h = 0;
+    return new Promise((resolve, reject) => {
+      movies.once('value', (snapshot) => {
+      console.log(1);
+      snapshot.forEach( childSnapshot => {
+        movieList[h] = childSnapshot.val().image_url;
+        h++;
+      });
+      if(movieList.length !== 0)
+      resolve(movieList);
+      else 
+      reject();
+    });
   });
-})
 }
 
 // ========================== EXPORTS =============================================
@@ -81,4 +133,5 @@ let getTotalPrice = () => {
   module.exports.authMobNo = authMobNo;
   module.exports.updatePass = updatePass;
   module.exports.getTotalPrice = getTotalPrice;
+  module.exports.getMovies = getMovies;
 

@@ -73,10 +73,6 @@
           <h4 class="modal-title" style="font-size:200%;"><b>ENTER THE DETAILS</b></h4>
         </div>
         <div class="modal-body">
-
-			<!--<p style="color:black;font-size:190%;text-align:left;">MEMBERS:</p>
-			<p style="color:black;font-size:190%;text-align:left;">DEPENDENTS:</p>
-			<p style="color:black;font-size:190%;text-align:left;">GUESTS:</p>-->
 	<form  class="form1" action="/layout" method="get" >
   <fieldset>
     <legend style="color:goldenrod;font-weight:bolder;">Information:</legend>
@@ -87,22 +83,17 @@
 	<option value="1">1</option>
 </select>
 </div>
-    <!--<select name="members">
-	<option value="1">Volvo</option>
-	<option value="2">Saab</option>
-	<option value="3">Fiat</option>
-	<option value="4">Audi</option>
-	</select>-->
     <br>
 	<div class="size">
     DEPENDENTS:
-    <select name="dependents">
+    <select id="ddl" name="dependents" onchange="calDependents(this.value)">
       <option value="0">0</option>
 	<option value="1">1</option>
 	<option value="2">2</option>
 	<option value="3">3</option>
 	<option value="4">4</option>
 	</select>
+
 	</div>
     <br>
 	<div class="size">
@@ -119,14 +110,16 @@
 	</div>
 	<br>
 	<button type="button" style="color: black;font-size: 18px;
-    background-color:goldenrod;" onclick="calculateseats(member,dependents,guests)">TOTAL SEATS:</button><p id="demo1" style="font-size:200%"></p>
-	<br>
-	<button type="button" style="color: black;font-size: 18px;
-    background-color:goldenrod;" onclick="calculate(member,dependents,guests)">TOTAL PRICE:</button><p id="demo" style="font-size:200%"></p>
+    background-color:goldenrod;" onclick="totalCalculate(member,dependents,guests)">TOTAL</button>
+
+<div style="font-size:200%">
+ SEATS: <p id="demo1" style="margin:15;display:inline;"></p>&nbsp;&nbsp;
+  PRICE:  <p id="demo" style="margin:15;display:inline;"></p>
+</div>
   </fieldset>
 
   <br><br>
-  <input style="color: black;font-size: 18px;
+  <input id="submit" style="color: black;font-size: 18px;
     background-color:goldenrod;" type="submit" value="Submit" onclick>
   <input style="color: black;font-size: 18px;
     background-color:goldenrod;" type="reset" value="Reset">
@@ -137,10 +130,21 @@ jQuery(function(){
 });
 </script>
 		<script>
+      window.onload = onLoad();
+      function onLoad() {
+        $('#submit').prop('disabled', true);
+      }
+    function calDependents(value) {
+      event.preventDefault();
+      if(value*1>{{Dc}})
+      {
+        alert("DEPENDENTS EXCEEDED!!!!");
+        this.value=0;
+        document.getElementById("ddl").selectedIndex = "0";
+      }
+    }
 		function calculate(member,dependents,guests) {
-										event.preventDefault();
-
-									//console.log(typeof(member));
+									event.preventDefault();
                   if(member.value*1==0 && dependents.value*1==0)
                   {
                     alert("PLEASE ENTER MEMBER OR DEPENDENT!!!!");
@@ -153,21 +157,19 @@ jQuery(function(){
 									<!--console.log(member.value, guests.value,dependents.value, sum,x);-->
 									document.getElementById("demo").innerHTML = sum;
                 }
-
 							 }
 		function calculateseats(member,dependents,guests) {
-										event.preventDefault();
-
-									//console.log(typeof(member));
-
-									/*var x = member.value;
-									var y= guests.value ;
-									var z= dependents.value;*/
+									event.preventDefault();
                   if(member.value*1==0 && dependents.value*1==0)
                   {
                     window.alert("PLEASE ENTER MEMBER OR DEPENDENT!!!!");
                   }
-                  else{
+                  else if(dependents.value*1>{{Dp}})
+                  {
+                    alert("DEPENDENTS EXCEEDED!!!!");
+                  }
+                  else{ 
+                    $('#submit').prop('disabled', false);
 									console.log(member.value);
 									console.log(dependents.value);
 									console.log(guests.value);
@@ -176,6 +178,11 @@ jQuery(function(){
 									document.getElementById("demo1").innerHTML = sum1;
                 }
 							 }
+               function totalCalculate(member,dependents,guests)
+               {
+                 calculateseats(member,dependents,guests);
+                 calculate(member,dependents,guests);
+               }
 	  </script>
         </div>
         <div style="background-color: black; " class="modal-footer">

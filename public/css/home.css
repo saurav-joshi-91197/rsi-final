@@ -71,6 +71,16 @@ ul>li> a:hover > .glyphicon{
   }
 }
 
+@media screen and (max-width: 330px) {
+    .ctgr {
+        font-size: 10px;
+    }
+
+    .ctgr {
+        margin-bottom: 5vh;
+    }
+}
+
 @keyframes opaque {
     100% {
         opacity: 1;

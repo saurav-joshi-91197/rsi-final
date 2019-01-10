@@ -5,7 +5,7 @@ const hbs = require('hbs');
 const flash = require('connect-flash');
 const app = express();
 const auth=require("./auth.js")
-const serviceAccount = require("./sk.json");
+const serviceAccount = require("./ss.json");
 const sendOTP = require('./sendMsg.js');
 let otp,mob,user;
 
@@ -139,9 +139,9 @@ app.get('/movies', (req, res) => {
 app.get('/dependents', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo){
-    auth.getTotalPrice()
+    auth.getTotalPrice(sess.rsiid)
     .then((obj) => {
-      console.log(obj.Gp, obj.Mp, obj.Dp);
+      console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
       res.render('dependents.hbs', obj);
     }, () => {
       res.redirect('/movies');
@@ -160,7 +160,7 @@ app.get('/layout', (req, res) => {
   }
   else
   {
-    res.redirect('/movie');
+    res.redirect('/movies');
   }
 });
 
