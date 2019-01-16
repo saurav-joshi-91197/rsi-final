@@ -107,24 +107,59 @@ let getTotalPrice = (rsiId) => {
 }
 
 // ============================= Get Movies =======================================
-let getMovies = () => {
-  let movies = admin.database().ref('Movies/');
-  movies.orderByChild('date');
-  let movieList = [" "," "," "," "," "," "," ",String("")];
-  let h = 0;
-    return new Promise((resolve, reject) => {
-      movies.once('value', (snapshot) => {
-      console.log(1);
-      snapshot.forEach( childSnapshot => {
-        movieList[h] = childSnapshot.val().image_url;
-        h++;
-      });
-      if(movieList.length !== 0)
-      resolve(movieList);
-      else 
-      reject();
+
+let getMovies=function()
+{
+  let movieDetails=admin.database().ref('Movies/');
+  return new Promise((resolve,reject)=>
+  {
+    movieDetails.orderByChild('date');
+    movieDetails.on('value',function(snapshot)
+    {
+      var obj=[];
+      snapshot.forEach(childSnapshot=>
+        {
+          let newobj=
+          {
+            movieKey:childSnapshot.key,
+            certification:childSnapshot.val().certification,
+            date:childSnapshot.val().date,
+            duration:childSnapshot.val().duration,
+            image_url:childSnapshot.val().image_url,
+            language:childSnapshot.val().language,
+            name:childSnapshot.val().name,
+            timing:childSnapshot.val().timing
+          }
+          obj.push(newobj);
+        })
+        resolve(obj);
+      })
+    
+  })
+}
+// ======================================= Get Summary ============================
+
+let getSummary = (movieId)=>{
+  let movie = admin.database().ref('Movies/'+movieId);
+  let details = {};
+  return new Promise((resolve, reject) => {
+    movie.once('value', (snapshot)=>{
+      details.time = snapshot.val().timing;
+      details.date = snapshot.val().date;
+      details.name = snapshot.val().name;
     });
+    resolve(details);
   });
+}
+
+// ============================ Book ticket =======================================
+
+let bookTicket = (arr, movieKey)=>{
+    var i;
+    console.log(arr);
+    for(i=0; i<arr.length; i++){
+        admin.database().ref('Movies/'+movieKey+'/hall/status/'+arr[i]).set("R");
+    }
 }
 
 // ========================== EXPORTS =============================================
@@ -134,4 +169,6 @@ let getMovies = () => {
   module.exports.updatePass = updatePass;
   module.exports.getTotalPrice = getTotalPrice;
   module.exports.getMovies = getMovies;
+  module.exports.getSummary = getSummary;
+  module.exports.bookTicket = bookTicket;
 

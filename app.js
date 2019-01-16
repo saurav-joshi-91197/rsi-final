@@ -128,7 +128,16 @@ app.get('/movies', (req, res) => {
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    res.sendFile(__dirname+'/public/movie.html');
+    auth.getMovies()
+    .then((obj)=>
+    {
+      res.render('movie.hbs',{
+        movieDetails : obj
+      });
+    },()=>
+    {
+      console.log("Reject");
+    })
   }
   else
   {
@@ -138,6 +147,7 @@ app.get('/movies', (req, res) => {
 
 app.get('/dependents', (req, res) => {
   sess = req.session;
+  sess.movieKey = req.query.key;
   if(sess.rsiid && sess.mobNo){
     auth.getTotalPrice(sess.rsiid)
     .then((obj) => {
@@ -154,14 +164,51 @@ app.get('/dependents', (req, res) => {
 
 app.get('/layout', (req, res) => {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo)
+  if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
-    res.sendFile(__dirname+'/public/seatlayout.html');
+    res.render('seatlayout.hbs', {
+      rsiid: sess.rsiid,
+      movieKey: sess.movieKey,
+      totalSeats: sess.totalSeats
+    });
   }
   else
   {
     res.redirect('/movies');
   }
+});
+
+app.get('/summary', (req, res)=>{
+  sess = req.session;
+  let seats = req.query.seats;
+  let arrSeats = JSON.parse(decodeURI(seats)).arr1;
+  let seatValues = "";
+  for(let key in arrSeats){
+    seatValues += arrSeats[key]+" ";
+  }
+  sess.arrSeats=arrSeats;
+  if(sess.rsiid && sess.mobNo && sess.movieKey)
+  {
+    auth.getSummary(sess.movieKey).then((details)=>{
+    res.render('summary.hbs', {
+      rsiid: sess.rsiid,
+      price: sess.totalPrice,
+      movie: details.name,
+      date: details.date,
+      time: details.time,
+      seats: seatValues
+      });
+    },
+    ()=>{console.log('In Reject');});
+  }
+  else
+  {
+    res.redirect('/movies');
+  }
+});
+
+app.get('/ticket', (req, res) => {
+  res.send("tickets booked");
 });
 
 app.get('/logout',function(req,res){
@@ -222,16 +269,19 @@ app.post('/OTPVerify', function (req, res) {
 });
 
 app.post('/idVerify',function(req,res){
-   user=req.body.rsiid;
-   sess = req.session;
-   auth.idVerify(user)
-   .then(()=>{
-     sess.rsiid = req.body.rsiid;
-     res.redirect('/userLogin');
-   }, ()=>{
-     req.flash('invalidID', 'Invalid RSI-ID! Please Try Again!');
-     res.redirect('/');
-   });
+  var field1=req.body.field1;
+  var field2=req.body.field2;
+  user=field1+'-'+field2;
+  user=user.toString();
+  sess = req.session;
+  auth.idVerify(user)
+  .then(()=>{
+    sess.rsiid = user;
+    res.redirect('/userLogin');
+  }, ()=>{
+    req.flash('invalidID', 'Invalid RSI-ID! Please Try Again!');
+    res.redirect('/');
+  });
 });
 
 app.post('/userVerify',function(req,res){
@@ -247,5 +297,19 @@ app.post('/userVerify',function(req,res){
      res.redirect('/userLogin');
    }); 
 });
+
+app.post('/layout', (req, res)=>{
+  sess = req.session;
+  sess.totalPrice = req.body.price;
+  sess.totalSeats = req.body.seats;
+  res.redirect('/layout');
+});
+
+app.post('/book', (req, res) => {
+  sess = req.session;
+  console.log(sess.arrSeats);
+  auth.bookTicket(sess.arrSeats, sess.movieKey);
+  res.redirect('/ticket');
+  });
 
 const server = app.listen(process.env.PORT || 5000);

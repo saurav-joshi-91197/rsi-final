@@ -38,6 +38,29 @@
     padding: 0;
   }
 }
+.two-col {
+    overflow: hidden;/* Makes this div contain its floats */
+}
+
+.two-col .col1 {
+    float: left;
+}
+
+.two-col .col2 {
+    float: right;
+}
+
+.two-col label {
+    display: block;
+}
+#field1:hover{
+  background-color: black;
+  border-color: goldenrod;
+}
+#field2:hover{
+  background-color: black;
+  border-color: goldenrod;
+}
   </style>
 </head>
 <body>
@@ -54,20 +77,26 @@
                 <div class="well color">
                   <div id="myTabContent" class="tab-content color">
                     <div class="tab-pane active in" id="login">
-                      <form class="form-horizontal" action='/idVerify' method="POST">
-                        <fieldset>   
+                      <form name="formName" oninput class="form-horizontal" action='/idVerify' method="POST">
+                        <fieldset>
                           <div class="control-group">
                             <label class="control-label"  for="rsiid">Enter Your RSI ID (Ex. X-1234)</label>
                               <div style="font-size: 13px; color: red; font-weight: bolder;">{{messages}}</div>
-                             <input type="text" class="form-control" style="background-color:black; border-color: goldenrod;color:goldenrod;" name="rsiid">
-                            </div>    
+
+
+                                 <input id="field1"  class="form" name="field1" style="background-color:black; width:20%;border-color: goldenrod;border-radius: 5px;color:goldenrod;" type="text" maxlength="1" oninput="autotab(this, document.formName.field2);this.value = this.value.toUpperCase()" >
+                                 <span class="glyphicon glyphicon-minus"></span>
+                                 <input id="field2" class="form" name="field2"  style="background-color:black;width:54%; float:top; border-color: goldenrod;border-radius: 5px;color:goldenrod;" type="number" oninput="generateFullName()">
+
+
+                            </div>
                           <div class="control-group">
                             <div class="controls">
-                              <button class="btn btn-success mybutton" style="background-color:goldenrod;border-color:goldenrod;color:black;">SUBMIT</button>
+                              <button class="btn btn-success mybutton" style="background-color:goldenrod;border-color:goldenrod;color:black;margin-top:3px;">SUBMIT</button>
                             </div>
                           </div>
                         </fieldset>
-                      </form>                
+                      </form>
                     </div>
                 </div>
               </div>
@@ -77,4 +106,23 @@
 </div>
 </div>
 </body>
+<script>
+var someInput = document.querySelector('#field1');
+someInput.addEventListener('input', function () {
+    someInput.value = someInput.value.toUpperCase();
+    field1.value=someInput.value;
+  //  alert(field1.value);
+});
+
+
+function autotab(current,to)
+{
+    if (current.getAttribute && current.value.length==current.getAttribute("maxlength"))
+    {
+        to.focus();
+        generateFullName();
+      //  alert("this.value");
+    }
+}
+</script>
 </html>

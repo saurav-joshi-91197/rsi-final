@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Movie selection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
+   <link rel="stylesheet" href="./css/movie.css"> 
+</head>
+
+<body style="background-image:url('./bg1.jpg'); background-size:contain">
+
+  
+<div class="container">
+
+  {{#each movieDetails}}      
+  <div class="card">   
+      <div class="card-header">
+        <img class="card-img" src={{image_url}} alt="Card image">
+      </div>  
+      <div class="card-body">
+        <h1 class="card-title">Movie: {{name}}</h1>
+        <p class="language">Language: {{language}}</p>
+        <p class="date">Date: {{date}}</p>
+        <p class="duration">Duration: {{duration}}Hrs</p>
+        <p class="timing">Timing: {{timing}}Hrs</p>
+        <a class="trailer-preview" href="/dependents?key={{movieKey}}">
+            <i class="fa fa-play" aria-hidden="true"></i>
+            </a>
+      </div>
+  </div>
+  {{/each}}
+
+</div>
+  <script src='https://use.fontawesome.com/7a267b3298.js'></script>
+</body>
+</html>
