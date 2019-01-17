@@ -182,14 +182,22 @@ app.get('/summary', (req, res)=>{
   sess = req.session;
   let seats = req.query.seats;
   let arrSeats = JSON.parse(decodeURI(seats)).arr1;
+  let stringValues = [];
+  for(let key1 in arrSeats){
+    stringValues.push(String(arrSeats[key1]));
+  }
   let seatValues = "";
   for(let key in arrSeats){
     seatValues += arrSeats[key]+" ";
   }
-  sess.arrSeats=arrSeats;
+  sess.arrSeats=stringValues;
+  console.log(seatValues);
   if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
     auth.getSummary(sess.movieKey).then((details)=>{
+      sess.movieName = details.name;
+      sess.time = details.time;
+      sess.date = details.date;
     res.render('summary.hbs', {
       rsiid: sess.rsiid,
       price: sess.totalPrice,
@@ -208,7 +216,22 @@ app.get('/summary', (req, res)=>{
 });
 
 app.get('/ticket', (req, res) => {
-  res.send("tickets booked");
+  sess = req.session;
+  let seats = '';
+  for(let key in sess.arrSeats){
+    seats += sess.arrSeats[key]+" ";
+  }
+  let ts = new Date().toLocaleString();
+  console.log(ts);
+  res.render('qrcode.hbs', {
+    movie: sess.movieName,
+    date: sess.date,
+    time: sess.time,
+    seats: seats,
+    rsiid: sess.rsiid,
+    price: sess.totalPrice,
+    seatList: sess.arrSeats
+  });
 });
 
 app.get('/logout',function(req,res){
@@ -300,7 +323,7 @@ app.post('/userVerify',function(req,res){
 
 app.post('/layout', (req, res)=>{
   sess = req.session;
-  sess.totalPrice = req.body.price;
+  sess.totalPrice = parseInt(req.body.price);
   sess.totalSeats = req.body.seats;
   res.redirect('/layout');
 });
@@ -309,6 +332,7 @@ app.post('/book', (req, res) => {
   sess = req.session;
   console.log(sess.arrSeats);
   auth.bookTicket(sess.arrSeats, sess.movieKey);
+  auth.insertTicket(sess.rsiid, sess.arrSeats, sess.movieName, sess.time, sess.date, sess.totalPrice);
   res.redirect('/ticket');
   });
 

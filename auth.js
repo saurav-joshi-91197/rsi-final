@@ -1,5 +1,6 @@
 var admin = require("firebase-admin");
 var serviceAccount = require("./ss.json");
+const dateTime = require('date-time');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -162,6 +163,21 @@ let bookTicket = (arr, movieKey)=>{
     }
 }
 
+// ============================ Insert Ticket Data ================================
+
+let insertTicket = (userID, arr, movieNmae, movietime, date, cost) => {
+  admin.database().ref('Tickets/'+userID+"/").push({
+    cost : cost,
+    date : date,
+    movieNmae : movieNmae,
+    movietime : movietime,
+    provisional : true,
+    timestamp : dateTime(admin.database.ServerValue.TIMESTAMP),
+    userID : userID,
+    seatsList : arr
+});
+}
+
 // ========================== EXPORTS =============================================
   module.exports.idVerify = idVerify;
   module.exports.authenticate = authenticate;
@@ -171,4 +187,5 @@ let bookTicket = (arr, movieKey)=>{
   module.exports.getMovies = getMovies;
   module.exports.getSummary = getSummary;
   module.exports.bookTicket = bookTicket;
+  module.exports.insertTicket = insertTicket;
 

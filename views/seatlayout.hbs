@@ -74,7 +74,7 @@
 </head>
 <body onload = "onLoadFunc()">
     <div>
-        <button class="button" onclick="start()">Start Selecting</button>
+        <button class="button but1" onclick="start()">Start Selecting</button>
     </div>
     <div class="seatStructure">
         <table class="center-block">
@@ -571,6 +571,7 @@
         var count = 0;
         var flag=0;
         function onLoadFunc(){
+            $(".but1").css("pointer-events", "none");
             var ref2 = firebase.database().ref("Movies/"+"{{movieKey}}"+"/hall/Users/");
             ref2.once('value',function(snapshot){
                 firebase.database().ref("Movies/"+"{{movieKey}}"+"/hall/Users/-1/time").set(firebase.database.ServerValue.TIMESTAMP);
@@ -597,6 +598,7 @@
                         $('.'+childSnapshot.key).css({"background-color":"#E98074"});
                     }
                 });
+                $(".but1").css("pointer-events", "auto");
             });
         }
 
