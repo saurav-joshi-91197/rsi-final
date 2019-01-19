@@ -35,6 +35,14 @@
   transform: scale(1);
   box-shadow: 0 3px 8px 18px rgba(9, 202, 154, 0.1), 0 3px 8px 8px rgba(241, 206, 7, 0.18);  
 }
+
+a {
+  padding: 10px;
+  background-color: crimson;
+  margin: 10px auto;
+  width: 40px;
+}
+
 @media only screen and (max-width: 400px){
 
   .container{

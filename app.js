@@ -240,6 +240,12 @@ app.get('/ticket', (req, res) => {
   });
 });
 
+app.get('/movieBooked', (req, res) => {
+  sess = req.session;
+  sess.movieKey = undefined;
+  res.redirect('/movie');
+});
+
 app.get('/logout',function(req,res){
   req.session.destroy(function(err) {
     if(err) {
