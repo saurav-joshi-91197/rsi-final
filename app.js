@@ -59,8 +59,8 @@ app.get('/home',function(req,res)
   sess = req.session;
   if(sess.rsiid && sess.mobNo)
   {
-    console.log(sess.rsiid);
-    console.log(sess.mobNo);
+    console.log(sess.rsiid, 1);
+    console.log(sess.mobNo, 2);
     res.render('home.hbs');
   }
   else
@@ -148,6 +148,9 @@ app.get('/movies', (req, res) => {
 app.get('/dependents', (req, res) => {
   sess = req.session;
   sess.movieKey = req.query.key;
+
+  //auth.checkBooking(sess.rsiid, sess.movieKey);
+
   if(sess.rsiid && sess.mobNo){
     auth.getTotalPrice(sess.rsiid)
     .then((obj) => {
@@ -163,6 +166,7 @@ app.get('/dependents', (req, res) => {
 });
 
 app.get('/layout', (req, res) => {
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   sess = req.session;
   if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
@@ -180,6 +184,7 @@ app.get('/layout', (req, res) => {
 
 app.get('/summary', (req, res)=>{
   sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   let seats = req.query.seats;
   let arrSeats = JSON.parse(decodeURI(seats)).arr1;
   let stringValues = [];
@@ -217,6 +222,7 @@ app.get('/summary', (req, res)=>{
 
 app.get('/ticket', (req, res) => {
   sess = req.session;
+  sess.movieKey = undefined;
   let seats = '';
   for(let key in sess.arrSeats){
     seats += sess.arrSeats[key]+" ";
@@ -331,9 +337,8 @@ app.post('/layout', (req, res)=>{
 app.post('/book', (req, res) => {
   sess = req.session;
   console.log(sess.arrSeats);
-  auth.bookTicket(sess.arrSeats, sess.movieKey);
+  auth.bookTicket(sess.arrSeats, sess.movieKey).then(()=>{res.redirect('/ticket')});
   auth.insertTicket(sess.rsiid, sess.arrSeats, sess.movieName, sess.time, sess.date, sess.totalPrice);
-  res.redirect('/ticket');
   });
 
 const server = app.listen(process.env.PORT || 5000);

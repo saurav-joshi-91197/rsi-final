@@ -4,7 +4,7 @@ const dateTime = require('date-time');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://rsi-ait.firebaseio.com"
+  databaseURL: "https://rsipune-f1dee.firebaseio.com"
 });
 
 /*
@@ -50,6 +50,7 @@ const authenticate = (user, mobile, pass) => {
     });
   })
   }
+// ============================== Change Password =================================
 
 const updatePass = (user, newPass, callback) => {
   admin.database().ref('UserSignIn/'+user + '/pass').set(newPass);
@@ -80,14 +81,15 @@ let getTotalPrice = (rsiId) => {
         }
         if(childSnapshot.key==='DepCount')
         {
-          console.log(rsiId);
+          console.log(rsiId, 3);
+          console.log(childSnapshot.key);
           var dep=admin.database().ref('DepCount/'+rsiId+'/');
           dep.on('value',snapshot=>
           {
             dependentCount=snapshot.val().depCount;
           })
         }
-      })
+      });
       if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
       {
         let obj = {
@@ -106,6 +108,14 @@ let getTotalPrice = (rsiId) => {
   }
 )})
 }
+// ============================= Check Booking ====================================
+
+// let checkBooking = (rsiId, movieKey) => {
+//   let db = admin.database().ref();
+//   db.once('value', (snapshot) => {
+//     console.log(snapshot.val().Movies[]);
+//   });
+// }
 
 // ============================= Get Movies =======================================
 
@@ -157,10 +167,18 @@ let getSummary = (movieId)=>{
 
 let bookTicket = (arr, movieKey)=>{
     var i;
+    var flag=0;
     console.log(arr);
-    for(i=0; i<arr.length; i++){
-        admin.database().ref('Movies/'+movieKey+'/hall/status/'+arr[i]).set("R");
-    }
+    return new Promise((resolve, reject) => { for(i=0; i<arr.length; i++){
+        admin.database().ref('Movies/'+movieKey+'/hall/status/'+arr[i]).set("R");  
+        flag+=1;
+      }
+      console.log(flag);
+      if(flag===arr.length)
+      {
+        resolve();
+      }
+  });
 }
 
 // ============================ Insert Ticket Data ================================
@@ -188,4 +206,4 @@ let insertTicket = (userID, arr, movieNmae, movietime, date, cost) => {
   module.exports.getSummary = getSummary;
   module.exports.bookTicket = bookTicket;
   module.exports.insertTicket = insertTicket;
-
+  //module.exports.checkBooking = checkBooking;
