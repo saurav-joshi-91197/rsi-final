@@ -28,7 +28,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // ============= Temporary Session Management =============================================
 const session = require('express-session');
 let sess;
-app.use(session({secret: 'j34H5+lNYNLmpFD5mUUSDg5M/bL5g+tmiRfeCt6L2hg='}));
+app.use(session(
+  {
+    secret: 'j34H5+lNYNLmpFD5mUUSDg5M/bL5g+tmiRfeCt6L2hg=',
+    resave: false,
+    saveUninitialized: false
+  }
+  ));
 //=========================================================================================
 
 app.set('views', __dirname+'/views');
@@ -148,20 +154,46 @@ app.get('/movies', (req, res) => {
 app.get('/dependents', (req, res) => {
   sess = req.session;
   sess.movieKey = req.query.key;
-
-  //auth.checkBooking(sess.rsiid, sess.movieKey);
-
-  if(sess.rsiid && sess.mobNo){
-    auth.getTotalPrice(sess.rsiid)
-    .then((obj) => {
-      console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
-      res.render('dependents.hbs', obj);
-    }, () => {
+  console.log(sess.rsiid, sess.movieKey, 24);
+  auth.checkBooking(sess.rsiid,sess.movieKey)
+  .then(()=>
+  {
+    console.log("Sanjay_Singh");
+    if(sess.rsiid && sess.mobNo){
+      auth.getTotalPrice(sess.rsiid)
+      .then((obj) => {
+        console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
+        res.render('dependents.hbs', obj);
+      }, () => {
+        res.redirect('/movies');
+      });
+    }
+    else{
+      res.redirect('/');
+    }
+  },()=>
+  {
+      req.flash('movieBooked', 'You have already booked tickets for this movie!');
       res.redirect('/movies');
+  })
+
+});
+
+app.get('/myTickets', (req, res) => {
+  if(req.session.rsiid && req.session.mobNo)
+  {auth.getTickets(req.session.rsiid)
+  .then((ticketArr)=> {
+    res.render('myTickets.hbs', {
+      ticketDetails: ticketArr
     });
-  }
-  else{
-    res.redirect('/');
+  },
+   () => {
+    console.log('kuch to gadbad hai');
+  });}
+
+  else
+  {
+    res.redirect('/userLogin');
   }
 });
 

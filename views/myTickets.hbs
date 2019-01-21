@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>qrcode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="./css/qrcode.css">
+  </head>
+  
+
+  <script src="./qrcode.min.js"></script>
+   
+  <body style="background-color:black;">
+    {{#each ticketDetails}}
+    <div class="container">
+      <div class="card">   
+               <div class="card-header" >
+                <div class="qrcode" >
+                  <canvas class="canvas" id="{{@index}}"></canvas>
+                </div>
+                 
+               </div>
+               <div class="card-body" >
+                  
+                  
+                    <ul class="list">
+                      <li class="movname">{{movieNmae}}</li>
+                      <li>Date: {{date}}</li>
+                      <li>Time: {{movietime}}</li>
+                      <li>Seats: {{seatsList}}</li>
+                      <li>RSAMI Id: {{userID}}</li>
+                      <li>Price: {{cost}}</li>
+                      </ul>
+                  
+               </div>
+      </div>
+      </div>
+    {{/each}}
+  </body>
+
+  <script>
+    let jsObj;
+    let qrData;
+    {{#each ticketDetails}}
+    jsObj = {
+        Movietime: "{{movietime}}",
+        cost: {{cost}},
+        date: "{{date}}",
+        movieNmae: "{{movieNmae}}",
+        provisional: true,
+        seatsList: [{{seatsList}}],
+        timestamp: "{{timestamp}}",
+        userID: "{{userID}}"
+      };
+    qrData = JSON.stringify(jsObj);
+      QRCode.toCanvas(document.getElementById('{{@index}}'), qrData, function (error) {
+        if (error) console.error(error)
+        console.log('success!');
+      })
+    {{/each}}
+    </script>  
+</html>

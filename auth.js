@@ -117,6 +117,46 @@ let getTotalPrice = (rsiId) => {
 //   });
 // }
 
+let checkBooking = (rsiid, movieKey) => {
+  var dateOfMovie,nameOfMovie;
+  return new Promise((resolve,reject)=>
+  {
+    var ref = admin.database().ref('Movies/'+movieKey);
+    ref.on('value',function(snapshot)
+    {
+      snapshot.forEach(childSnapshot=>
+        {
+          console.log(childSnapshot.key);
+          if(childSnapshot.key==='date')
+          {
+            dateOfMovie=childSnapshot.val();
+            console.log("Date :"+dateOfMovie);
+          }
+          if(childSnapshot.key==='name')
+          {
+            nameOfMovie=childSnapshot.val();
+            console.log("Name :"+nameOfMovie);
+          }
+        })
+        console.log("Details :"+dateOfMovie+" "+nameOfMovie);
+  
+        var ref1 = admin.database().ref("Tickets/"+rsiid);
+        ref1.on('value',function(snapshot){
+          snapshot.forEach(childSnapshot=>{
+            var ref2 = admin.database().ref("Tickets/"+rsiid+"/"+childSnapshot.key);
+            ref2.on('value',function(snapshot){
+              if(snapshot.val().movieNmae===nameOfMovie && snapshot.val().date===dateOfMovie){
+                console.log("Date :"+dateOfMovie+" Name :"+nameOfMovie);
+                reject();
+              }
+              })
+              resolve();
+            })
+        })     
+})
+})
+}
+
 // ============================= Get Movies =======================================
 
 let getMovies=function()
@@ -196,14 +236,32 @@ let insertTicket = (userID, arr, movieNmae, movietime, date, cost) => {
 });
 }
 
+// ========================== Get Tickets =========================================
+
+let getTickets = (user) => {
+  console.log('in function');
+  let ticketArr = [];
+  let tickets = admin.database().ref('Tickets/' + user);
+  return new Promise ((resolve, reject) => 
+  {tickets.on('value', (snapshot) => {
+    snapshot.forEach(childSnapshot => {
+      ticketArr.push(childSnapshot.val());
+    });
+    console.log(ticketArr);
+    resolve(ticketArr);}
+  )});
+}
+
 // ========================== EXPORTS =============================================
-  module.exports.idVerify = idVerify;
-  module.exports.authenticate = authenticate;
-  module.exports.authMobNo = authMobNo;
-  module.exports.updatePass = updatePass;
-  module.exports.getTotalPrice = getTotalPrice;
-  module.exports.getMovies = getMovies;
-  module.exports.getSummary = getSummary;
-  module.exports.bookTicket = bookTicket;
-  module.exports.insertTicket = insertTicket;
-  //module.exports.checkBooking = checkBooking;
+module.exports.idVerify = idVerify;
+module.exports.authenticate = authenticate;
+module.exports.authMobNo = authMobNo;
+module.exports.updatePass = updatePass;
+module.exports.getTotalPrice = getTotalPrice;
+module.exports.getMovies = getMovies;
+module.exports.getSummary = getSummary;
+module.exports.bookTicket = bookTicket;
+module.exports.insertTicket = insertTicket;
+module.exports.getTickets = getTickets;
+module.exports.checkBooking = checkBooking;
+

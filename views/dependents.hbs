@@ -108,19 +108,19 @@
   <input id="price" type="hidden" name="price">
   <input id="seats" type="hidden" name="seats">
 	<br>
-	<button type="button" style="color: black;font-size: 18px;
-    background-color:goldenrod;" onclick="totalCalculate(member,dependents,guests)">TOTAL</button>
+	<!-- <button type="button" style="color: black;font-size: 18px;
+    background-color:goldenrod;" onclick="totalCalculate(member,dependents,guests)">TOTAL</button> -->
 
-<div style="font-size:200%">
+<!-- <div style="font-size:200%">
  SEATS: <p id="demo1" style="margin:15;display:inline;"></p>&nbsp;&nbsp;
  PRICE:  <p id="demo" style="margin:15;display:inline;"></p>
-</div>
+</div> -->
   </fieldset>
 
   <br><br>
   <button id="" style="color: black;font-size: 18px;
     background-color:goldenrod;" onclick="submit">Submit</button>
-  
+
   <button style="color: black;font-size: 18px;
     background-color:goldenrod;" type="reset" onclick="resetFields();">Reset</button>
 </form>
@@ -140,6 +140,15 @@ jQuery(function(){
         if(member.value*1!=0 || dependents.value*1!=0)
         {
           //window.alert("Please Select At Least Member Or Dependent!!!");
+          // var totcost=calculate(member,dependents,guests);
+          // var totseat=calculateseats(member,dependents,guests);
+          // document.getElementById("price").value = totcost;
+          // document.getElementById("seats").value = totseat;
+          let totseat = member.value*1 + guests.value*1 + dependents.value*1;
+          let totcost = member.value*1*{{Mp}} + guests.value*1*{{Gp}} + dependents.value*1*{{Dp}};
+          document.getElementById("price").value = totcost;
+          document.getElementById("seats").value = totseat;
+         return confirm("TOTAL SEATS:"+totseat+" "+"TOTAL PRICE:"+totcost);
           return true;
         }
         else
@@ -188,7 +197,7 @@ jQuery(function(){
                     alert("DEPENDENTS EXCEEDED!!!!");
                   }
                   else
-                  { 
+                  {
 									var sum1=member.value*1 +guests.value*1 +dependents.value*1;
 									<!--console.log(member.value, guests.value,dependents.value, sum,x);-->
 									document.getElementById("demo1").innerHTML = sum1;
@@ -206,7 +215,7 @@ jQuery(function(){
            <p style="float: left;color:goldenrod;font-weight:bolder;font-size:21px;">Pricing:</p><br/><br/>
            <p style="float: left;color:white;font-size:20px;">Member/Dependent @ ₹{{Mp}}</p><br/><br/>
            <p style="float: left;color:white;font-size:20px;">Guest @ ₹{{Gp}}</p>
-          {{!-- <button  style="background-color: goldenrod;color:black;font-weight:bolder;"type="button" class="btn btn-default" data-dismiss="modal">Close</button> --}}
+          <button  style="background-color: goldenrod;color:black;font-weight:bolder;"type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
 

@@ -44,10 +44,14 @@ body {
   margin-top: -15%;
 }
 
+.siz{
+	height : auto;
+}
+
 .card-body {
   position: relative;
   margin-top: -30%;
-  color: #9FA7A9;
+  color: black;
 }
 .card-body .card-title {
   font-weight: 600;
@@ -68,14 +72,19 @@ body {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1), 0 8px 8px rgba(0, 0, 0, 0.18);
 }
 
+.align{
+  margin-top: -120px;
+}
+
 .card {
   border-radius: 8pt;
   border-style: none;
   overflow: hidden;
   transform: scale(0.8);
-  margin-top: -60px;
-  max-width: 80%;
-  margin-left: 10%;
+  margin-top: 0%;
+  max-width: 250%;
+  margin-right: 1px;
+  /* margin-left: 2%; */
   /* margin-right: 10%; */
 }
 

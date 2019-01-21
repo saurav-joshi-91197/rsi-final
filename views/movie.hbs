@@ -7,16 +7,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
-   <link rel="stylesheet" href="./css/movie.css"> 
+  <link rel="stylesheet" href="./css/movie.css"> 
 </head>
 
 <body style="background-image:url('./bg1.jpg'); background-size:contain">
 
   
-<div class="container">
-
-  {{#each movieDetails}}      
-  <div class="card">   
+  <div style="font-size: 20px; color: red; font-weight: bolder;">{{messages}}</div>
+  <div class="align">
+  <div class="row">
+  {{#each movieDetails}} 
+  <div class="container col-lg-3">     
+  <div class="card siz"> 
       <div class="card-header">
         <img class="card-img" src={{image_url}} alt="Card image">
       </div>  
@@ -31,9 +33,10 @@
             </a>
       </div>
   </div>
+  </div>
   {{/each}}
-
-</div>
+  </div>
+  </div>
   <script src='https://use.fontawesome.com/7a267b3298.js'></script>
 </body>
 </html>
