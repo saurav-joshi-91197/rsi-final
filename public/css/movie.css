@@ -5,6 +5,14 @@ body {
   padding-top: 10%;
 }
 
+#button
+{
+  font-size:20px;
+  font-weight: bolder;
+  height:50px;
+}
+
+
 .col-md-5, .description {
   padding: 0;
 }

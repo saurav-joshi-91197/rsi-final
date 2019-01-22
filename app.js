@@ -6,7 +6,7 @@ const flash = require('connect-flash');
 const app = express();
 const auth=require("./auth.js")
 const serviceAccount = require("./ss.json");
-const sendOTP = require('./sendMsg.js');
+const sendMsg = require('./sendMsg.js');
 let otp,mob,user;
 
 function generateOTP() {
@@ -35,14 +35,23 @@ app.use(session(
     saveUninitialized: false
   }
   ));
+
 //=========================================================================================
 
 app.set('views', __dirname+'/views');
 app.set('view engine', 'hbs');
 
+hbs.registerHelper('if_eq', function(a, b, opts) {
+  if(a == b)
+      return opts.fn(this);
+  else
+      return opts.inverse(this);
+});
+
+
 app.use(express.static('./public'));
 
-//===============================================GET======================================
+//===============================================GET=======================================
 
 app.get('/', function (req, res) {
   res.render('idLogin.hbs', { messages: req.flash('invalidID') });
@@ -50,7 +59,11 @@ app.get('/', function (req, res) {
 
 app.get('/requestOTP', (req, res)=>{
   sess = req.session;
-  if(sess.rsiid)
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if(sess.rsiid||sess.rsiAdmin)
   {
     res.render('userPhoneVerify.hbs', {messages: req.flash('invalidMobNo')});
   }
@@ -63,10 +76,12 @@ app.get('/requestOTP', (req, res)=>{
 app.get('/home',function(req,res)
 {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo)
+  if(sess.rsiAdmin==='A-007')
   {
-    console.log(sess.rsiid, 1);
-    console.log(sess.mobNo, 2);
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
     res.render('home.hbs');
   }
   else
@@ -77,7 +92,11 @@ app.get('/home',function(req,res)
 
 app.get('/userLogin', (req, res) => {
   sess = req.session;
-  if(sess.rsiid)
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin))
   {res.render('userLogin.hbs', {messages:req.flash('invalidUser')});}
   else
   {res.redirect('/');}
@@ -85,7 +104,11 @@ app.get('/userLogin', (req, res) => {
 
 app.get('/sendOTP', (req, res) => {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo)
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
     res.render('sendOTP.hbs', {messages: req.flash('invalidOTP')});
   }
@@ -96,7 +119,11 @@ app.get('/sendOTP', (req, res) => {
 
 app.get('/changePassword', (req, res) => {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo && sess.otp)
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo && sess.otp)
   {
     res.render('changePassword.hbs', {messages: req.flash('unequalPassword')});
   }
@@ -108,7 +135,11 @@ app.get('/changePassword', (req, res) => {
 
 app.get('/contact', (req, res) => {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo)
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
     res.sendFile(__dirname+'/public/contact.html');
   }
@@ -120,7 +151,11 @@ app.get('/contact', (req, res) => {
 
 app.get('/history', (req, res) => {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo)
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
     res.sendFile(__dirname+'/public/history.html');
   }
@@ -130,15 +165,82 @@ app.get('/history', (req, res) => {
   }
 });
 
+app.get('/addMovie',(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('addmovie.hbs');
+  }
+  else
+  {
+    res.redirect('/movies');
+  }
+})
+
+app.get('/movieAdded',(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.redirect('/movies');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+})
+
+app.get('/deleteMovie',(req,res)=>
+{
+  movieKey=req.query.key;
+  console.log(movieKey);
+  var ref=admin.database().ref('Movies/'+movieKey).remove();
+  res.redirect('/movies');
+})
+
+app.get('/adminBooking',(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('adminBooking.hbs');
+  }
+  else
+  {
+    res.redirect('/movies');
+  }
+})
+
+app.get('/adminVSuser',(req,res)=>
+{
+  sess=req.session;
+  sess.movieKey=req.query.key;
+  console.log("AdminVSUser :"+sess.rsiAdmin+" "+sess.mobNo+" "+sess.newMob+" "+sess.rsiid);
+  if(user==='A-007')
+  {
+    res.redirect('/adminBooking');
+  }
+  else
+  {
+    res.redirect('/dependents');
+  }
+})
+
 app.get('/movies', (req, res) => {
   sess = req.session;
-  if(sess.rsiid && sess.mobNo)
+  if(sess.rsiAdmin==='A-007')
   {
-    auth.getMovies()
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    auth.getMovies(sess.rsiid)
     .then((obj)=>
     {
       res.render('movie.hbs',{
-        movieDetails : obj
+        movieDetails : obj,
+        adminId: sess.rsiAdmin
       });
     },()=>
     {
@@ -153,13 +255,10 @@ app.get('/movies', (req, res) => {
 
 app.get('/dependents', (req, res) => {
   sess = req.session;
-  sess.movieKey = req.query.key;
-  console.log(sess.rsiid, sess.movieKey, 24);
   auth.checkBooking(sess.rsiid,sess.movieKey)
   .then(()=>
   {
-    console.log("Sanjay_Singh");
-    if(sess.rsiid && sess.mobNo){
+    if(sess.rsiid && (sess.mobNo||sess.newMob)){
       auth.getTotalPrice(sess.rsiid)
       .then((obj) => {
         console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
@@ -173,22 +272,28 @@ app.get('/dependents', (req, res) => {
     }
   },()=>
   {
-      req.flash('movieBooked', 'You have already booked tickets for this movie!');
+      console.log("Already Booked!!!");
+      req.flash('movieBooked', 'You Have Already Booked Tickets For This Movie!!!');
       res.redirect('/movies');
   })
 
 });
 
 app.get('/myTickets', (req, res) => {
-  if(req.session.rsiid && req.session.mobNo)
-  {auth.getTickets(req.session.rsiid)
+  sess=req.session;
+  if(sess.rsiAdmin==='A-007')
+  {
+    sess.rsiid='A-007';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {auth.getTickets(sess.rsiid)
   .then((ticketArr)=> {
     res.render('myTickets.hbs', {
       ticketDetails: ticketArr
     });
   },
    () => {
-    console.log('kuch to gadbad hai');
+    console.log('Some Error Is There!!!');
   });}
 
   else
@@ -200,7 +305,7 @@ app.get('/myTickets', (req, res) => {
 app.get('/layout', (req, res) => {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   sess = req.session;
-  if(sess.rsiid && sess.mobNo && sess.movieKey)
+  if(sess.rsiid && (sess.mobNo||sess.newMob) && sess.movieKey)
   {
     res.render('seatlayout.hbs', {
       rsiid: sess.rsiid,
@@ -244,7 +349,7 @@ app.get('/summary', (req, res)=>{
       seats: seatValues
       });
     },
-    ()=>{console.log('In Reject');});
+    ()=>{console.log('In Reject Of Summary!!!');});
   }
   else
   {
@@ -254,11 +359,13 @@ app.get('/summary', (req, res)=>{
 
 app.get('/ticket', (req, res) => {
   sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   sess.movieKey = undefined;
   let seats = '';
   for(let key in sess.arrSeats){
     seats += sess.arrSeats[key]+" ";
   }
+  sendMsg.sendBookingConfirmation(sess.rsiid, seats, sess.movieName, sess.time, sess.date, sess.mobNo);
   let ts = new Date().toLocaleString();
   console.log(ts);
   res.render('qrcode.hbs', {
@@ -287,10 +394,10 @@ app.get('/logout',function(req,res){
 app.post('/phoneVerify', function (req, res) {
   let mobNo = req.body.mobNo;
   sess = req.session;
-  auth.authMobNo(user, mobNo)
+  auth.authMobNo(ses.rsiid, mobNo)
   .then(()=>{
     otp = generateOTP();
-    sendOTP.sendMsg(otp, mobNo)
+    sendMsg.sendOTP(otp, mobNo)
     sess.mobNo = mobNo;
     res.redirect('/sendOTP');
   }, () => {
@@ -304,7 +411,7 @@ app.post('/changePasswordVerify', function (req, res) {
   var cnfmPass=req.body.cnfmPass;
   if(newPass === cnfmPass)
     {
-      auth.updatePass(user, newPass, (filename)=>{
+      auth.updatePass(sess.rsiid, newPass, (filename)=>{
       res.redirect(filename);
     });
   }
@@ -337,7 +444,15 @@ app.post('/idVerify',function(req,res){
   sess = req.session;
   auth.idVerify(user)
   .then(()=>{
-    sess.rsiid = user;
+    if(user==='A-007')
+    {
+      sess.rsiAdmin='A-007';
+      sess.rsiid=user;
+    }
+    else
+    {
+      sess.rsiid = user;
+    }
     res.redirect('/userLogin');
   }, ()=>{
     req.flash('invalidID', 'Invalid RSI-ID! Please Try Again!');
@@ -349,7 +464,7 @@ app.post('/userVerify',function(req,res){
   mobNo = req.body.mobNo;
   sess = req.session;
 	var password=req.body.rsipass;
-   auth.authenticate(user,mobNo,password)
+   auth.authenticate(sess.rsiid,mobNo,password)
    .then(()=>{
      sess.mobNo = mobNo;
      res.redirect('/home');
@@ -359,6 +474,30 @@ app.post('/userVerify',function(req,res){
    }); 
 });
 
+app.post('/movieAdded', (req,res)=>{
+  var certification = req.body.certification;
+  var date = req.body.date;
+  var duration = req.body.duration;
+  var language = req.body.language;
+  var name = req.body.movieName;
+  var timing = req.body.timing;
+  var imageFile = req.body.imageFile;
+  var Users = {'-1':{'time':admin.database.ServerValue.TIMESTAMP}};
+  var status = ['A','A', 'A','A','A', 'A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A','A','A', 'A','A'];
+
+  admin.database().ref('Movies/').push({
+      certification : certification,
+      date : date,
+      image_url : imageFile,
+      duration : duration,
+      language : language,
+      hall : {Users, status},
+      name : name,
+      timing : timing
+  });
+  res.redirect('/movieAdded');
+});
+
 app.post('/layout', (req, res)=>{
   sess = req.session;
   sess.totalPrice = parseInt(req.body.price);
@@ -366,9 +505,16 @@ app.post('/layout', (req, res)=>{
   res.redirect('/layout');
 });
 
+app.post('/adminUserDetails',(req,res)=>
+{
+  sess=req.session;
+  sess.rsiid=req.body.rsiid;
+  sess.newMob=req.body.newMob;
+  res.redirect('/dependents');
+})
+
 app.post('/book', (req, res) => {
   sess = req.session;
-  console.log(sess.arrSeats);
   auth.bookTicket(sess.arrSeats, sess.movieKey).then(()=>{res.redirect('/ticket')});
   auth.insertTicket(sess.rsiid, sess.arrSeats, sess.movieName, sess.time, sess.date, sess.totalPrice);
   });

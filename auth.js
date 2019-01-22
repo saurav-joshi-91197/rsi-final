@@ -7,13 +7,6 @@ admin.initializeApp({
   databaseURL: "https://rsipune-f1dee.firebaseio.com"
 });
 
-/*
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://rsi-project-656a3.firebaseio.com"
-});
-*/
-
 const idVerify = (user, callback) => {
     var uid = admin.database().ref('UserSignIn/'+user);
  return new Promise ((resolve, reject) => {uid.on('value', function(snapshot) {
@@ -27,7 +20,7 @@ const idVerify = (user, callback) => {
 // ====================== mobNO and password verification promise =====================
 const authenticate = (user, mobile, pass) => {
     var uid = admin.database().ref('UserSignIn/'+user);
-    console.log(mobile, pass);
+    console.log("User Is: "+mobile+" "+pass);
   return new Promise( (resolve, reject) =>   
 {  uid.on('value',function(snapshot){
     if(snapshot.val().mobno === mobile && snapshot.val().pass === pass){
@@ -79,16 +72,17 @@ let getTotalPrice = (rsiId) => {
             dependentPrice=snapshot.val().memPrice;
           })
         }
+        /*
         if(childSnapshot.key==='DepCount')
         {
-          console.log(rsiId, 3);
-          console.log(childSnapshot.key);
           var dep=admin.database().ref('DepCount/'+rsiId+'/');
+          console.log(dep);
           dep.on('value',snapshot=>
           {
             dependentCount=snapshot.val().depCount;
           })
-        }
+        }*/
+        dependentCount=0;
       });
       if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
       {
@@ -108,14 +102,6 @@ let getTotalPrice = (rsiId) => {
   }
 )})
 }
-// ============================= Check Booking ====================================
-
-// let checkBooking = (rsiId, movieKey) => {
-//   let db = admin.database().ref();
-//   db.once('value', (snapshot) => {
-//     console.log(snapshot.val().Movies[]);
-//   });
-// }
 
 let checkBooking = (rsiid, movieKey) => {
   var dateOfMovie,nameOfMovie;
@@ -126,32 +112,27 @@ let checkBooking = (rsiid, movieKey) => {
     {
       snapshot.forEach(childSnapshot=>
         {
-          console.log(childSnapshot.key);
           if(childSnapshot.key==='date')
           {
             dateOfMovie=childSnapshot.val();
-            console.log("Date :"+dateOfMovie);
           }
           if(childSnapshot.key==='name')
           {
             nameOfMovie=childSnapshot.val();
-            console.log("Name :"+nameOfMovie);
           }
         })
-        console.log("Details :"+dateOfMovie+" "+nameOfMovie);
-  
+
         var ref1 = admin.database().ref("Tickets/"+rsiid);
         ref1.on('value',function(snapshot){
           snapshot.forEach(childSnapshot=>{
             var ref2 = admin.database().ref("Tickets/"+rsiid+"/"+childSnapshot.key);
             ref2.on('value',function(snapshot){
               if(snapshot.val().movieNmae===nameOfMovie && snapshot.val().date===dateOfMovie){
-                console.log("Date :"+dateOfMovie+" Name :"+nameOfMovie);
                 reject();
               }
               })
-              resolve();
             })
+            resolve();
         })     
 })
 })
@@ -159,7 +140,7 @@ let checkBooking = (rsiid, movieKey) => {
 
 // ============================= Get Movies =======================================
 
-let getMovies=function()
+let getMovies=function(rsiid)
 {
   let movieDetails=admin.database().ref('Movies/');
   return new Promise((resolve,reject)=>
@@ -179,7 +160,8 @@ let getMovies=function()
             image_url:childSnapshot.val().image_url,
             language:childSnapshot.val().language,
             name:childSnapshot.val().name,
-            timing:childSnapshot.val().timing
+            timing:childSnapshot.val().timing,
+            rsiid:rsiid
           }
           obj.push(newobj);
         })
@@ -208,12 +190,10 @@ let getSummary = (movieId)=>{
 let bookTicket = (arr, movieKey)=>{
     var i;
     var flag=0;
-    console.log(arr);
     return new Promise((resolve, reject) => { for(i=0; i<arr.length; i++){
         admin.database().ref('Movies/'+movieKey+'/hall/status/'+arr[i]).set("R");  
         flag+=1;
       }
-      console.log(flag);
       if(flag===arr.length)
       {
         resolve();
@@ -234,6 +214,28 @@ let insertTicket = (userID, arr, movieNmae, movietime, date, cost) => {
     userID : userID,
     seatsList : arr
 });
+admin.database().ref('Tickets/'+'A-007'+"/").push({
+  cost : cost,
+  date : date,
+  movieNmae : movieNmae,
+  movietime : movietime,
+  provisional : true,
+  timestamp : dateTime(admin.database.ServerValue.TIMESTAMP),
+  userID : userID,
+  seatsList : arr
+});
+admin.database().ref('Summary/'+date+'/'+userID+'/').set({
+  date : date,
+  dependents : '0',
+  guest :'0',
+  member : '0',
+  movieName : movieNmae,
+  rsiID : userID,
+  seats : 'Default',
+  time :movietime,
+  totalCost : cost,
+  typeOfTicket : 'Provisional'
+});//InComplete!!!
 }
 
 // ========================== Get Tickets =========================================
@@ -247,7 +249,6 @@ let getTickets = (user) => {
     snapshot.forEach(childSnapshot => {
       ticketArr.push(childSnapshot.val());
     });
-    console.log(ticketArr);
     resolve(ticketArr);}
   )});
 }

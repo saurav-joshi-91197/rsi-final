@@ -11,9 +11,14 @@
 </head>
 
 <body style="background-image:url('./bg1.jpg'); background-size:contain">
-
+  <div>
+      {{#if_eq adminId 'A-007'}}
+        <button id="button" onclick="window.location.href='/addMovie'" type="button">
+         ADD MOVIE</button>
+      {{/if_eq}}
+  </div>
   
-  <div style="font-size: 20px; color: red; font-weight: bolder;">{{messages}}</div>
+  <div style="font-size: 100px; color: red; font-weight: bolder;">{{messages}}</div>
   <div class="align">
   <div class="row">
   {{#each movieDetails}} 
@@ -28,10 +33,14 @@
         <p class="date">Date: {{date}}</p>
         <p class="duration">Duration: {{duration}}Hrs</p>
         <p class="timing">Timing: {{timing}}Hrs</p>
-        <a class="trailer-preview" href="/dependents?key={{movieKey}}">
+        <a class="trailer-preview" href="/adminVSuser?key={{movieKey}}">
             <i class="fa fa-play" aria-hidden="true"></i>
-            </a>
+        </a>
       </div>
+      {{#if_eq rsiid 'A-007'}}
+        <button id="button" onclick="window.location.href='/deleteMovie?key={{movieKey}}'" type="button">
+         DELETE</button>
+      {{/if_eq}}
   </div>
   </div>
   {{/each}}
