@@ -1,10 +1,10 @@
 var admin = require("firebase-admin");
-var serviceAccount = require("./ss.json");
+var serviceAccount = require("./sj.json");
 const dateTime = require('date-time');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://rsipune-f1dee.firebaseio.com"
+  databaseURL: "https://rsi-demo.firebaseio.com/"
 });
 
 const idVerify = (user, callback) => {
