@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" >
-
 <head>
   <meta charset="UTF-8">
-  <title>Movie selection</title>
+  <title>RSI Pune</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
@@ -11,14 +10,8 @@
 </head>
 
 <body style="background-image:url('./bg1.jpg'); background-size:contain">
-  <div>
-      {{#if_eq adminId 'A-007'}}
-        <button id="button" onclick="window.location.href='/addMovie'" type="button">
-         ADD MOVIE</button>
-      {{/if_eq}}
-  </div>
   
-  <div style="font-size: 100px; color: red; font-weight: bolder;">{{messages}}</div>
+  
   <div class="align">
   <div class="row">
   {{#each movieDetails}} 
@@ -29,7 +22,8 @@
       </div>  
       <div class="card-body">
         <h1 class="card-title">Movie: {{name}}</h1>
-        <p class="language">Language: {{language}}</p>
+        <div style="font-size: 13px; color: red; font-weight: bolder;">{{messages}}</div>
+        <p class="language">Language: {{language}}{{messages}}</p>
         <p class="date">Date: {{date}}</p>
         <p class="duration">Duration: {{duration}}Hrs</p>
         <p class="timing">Timing: {{timing}}Hrs</p>
@@ -37,7 +31,7 @@
             <i class="fa fa-play" aria-hidden="true"></i>
         </a>
       </div>
-      {{#if_eq rsiid 'A-007'}}
+      {{#if_eq rsiid 'S-2119'}}
         <button id="button" onclick="window.location.href='/deleteMovie?key={{movieKey}}'" type="button">
          DELETE</button>
       {{/if_eq}}
@@ -46,6 +40,14 @@
   {{/each}}
   </div>
   </div>
+  <footer>
+    <div>
+       {{#if_eq adminId 'S-2119'}}
+        <button id="button" class="pos btn" onclick="window.location.href='/addMovie'" type="button">
+         ADD MOVIE</button>
+      {{/if_eq}}
+    </div>
+  </footer>
   <script src='https://use.fontawesome.com/7a267b3298.js'></script>
 </body>
 </html>

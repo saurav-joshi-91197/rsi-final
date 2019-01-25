@@ -1,10 +1,10 @@
 var admin = require("firebase-admin");
-var serviceAccount = require("./sj.json");
+var serviceAccount = require("./ss.json");
 const dateTime = require('date-time');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://rsi-demo.firebaseio.com/"
+  databaseURL: "https://rsi-demo.firebaseio.com"
 });
 
 const idVerify = (user, callback) => {
@@ -17,10 +17,10 @@ const idVerify = (user, callback) => {
    }
 });})}
 
-// ====================== mobNO and password verification promise =====================
+// ====================== mobNO and password Verification Promise =====================
 const authenticate = (user, mobile, pass) => {
     var uid = admin.database().ref('UserSignIn/'+user);
-    console.log("User Is: "+mobile+" "+pass);
+  console.log("User Is: "+user+mobile+" "+pass);
   return new Promise( (resolve, reject) =>   
 {  uid.on('value',function(snapshot){
     if(snapshot.val().mobno === mobile && snapshot.val().pass === pass){
@@ -31,7 +31,7 @@ const authenticate = (user, mobile, pass) => {
   });
 });
 }
-// ============================== mobNo verification ===============================
+// ============================== mobNo Verification ===============================
   const authMobNo = (user, mobile) => {
     var uid = admin.database().ref('UserSignIn/'+user);
     return new Promise ((resolve, reject) => {uid.on('value',function(snapshot){
@@ -43,6 +43,34 @@ const authenticate = (user, mobile, pass) => {
     });
   })
   }
+
+//=============================== mobNo And User Verification======================
+
+const authMobUser = (user, mobile) => {
+  var uid = admin.database().ref('UserSignIn/');
+  return new Promise ((resolve, reject) => {uid.on('value',function(snapshot){
+    uid.on('value',snapshot=>
+    {
+      snapshot.forEach(childSnapshot=>
+        {
+          ref=admin.database().ref('UserSignIn/'+user);
+          ref.on('value',snapshot=>
+          {
+            if(snapshot.val().mobno===mobile)
+            {
+              resolve();
+            }
+            else
+            {
+              reject();
+            }
+          })
+        })
+    })
+  });
+})
+}
+
 // ============================== Change Password =================================
 
 const updatePass = (user, newPass, callback) => {
@@ -55,7 +83,7 @@ let getTotalPrice = (rsiId) => {
   let guestPrice;
   let membersPrice;
   let dependentPrice;
-  let dependentCount;
+  let dependentCount=null;
   let flag=0;
   let settings = admin.database().ref();
   return new Promise((resolve, reject) => {settings.on('value', function(snapshot)
@@ -72,18 +100,31 @@ let getTotalPrice = (rsiId) => {
             dependentPrice=snapshot.val().memPrice;
           })
         }
-        /*
+        
         if(childSnapshot.key==='DepCount')
         {
-          var dep=admin.database().ref('DepCount/'+rsiId+'/');
-          console.log(dep);
-          dep.on('value',snapshot=>
+          var DepCount=admin.database().ref('DepCount');
+          DepCount.on('value',snapshot=>
           {
-            dependentCount=snapshot.val().depCount;
+            snapshot.forEach(childSnapshot=>
+              {
+                if(childSnapshot.key===rsiId)
+                {
+                  ref=admin.database().ref('DepCount/'+rsiId+'/depCount');
+                  ref.on('value',snapshot=>
+                  {
+                    dependentCount=snapshot.val();
+                  })
+                }
+              })
           })
-        }*/
-        dependentCount=0;
+        }
       });
+      if(dependentCount===null)
+      {
+        dependentCount=0;
+      }
+      //console.log(dependentCount);
       if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
       {
         let obj = {
@@ -142,10 +183,9 @@ let checkBooking = (rsiid, movieKey) => {
 
 let getMovies=function(rsiid)
 {
-  let movieDetails=admin.database().ref('Movies/');
+  let movieDetails=admin.database().ref('Movies/').orderByChild('date');
   return new Promise((resolve,reject)=>
   {
-    movieDetails.orderByChild('date');
     movieDetails.on('value',function(snapshot)
     {
       var obj=[];
@@ -203,7 +243,8 @@ let bookTicket = (arr, movieKey)=>{
 
 // ============================ Insert Ticket Data ================================
 
-let insertTicket = (userID, arr, movieNmae, movietime, date, cost) => {
+let insertTicket = (userID, arr,seatInteger,seatValues, movieNmae, movietime, date, cost,member,dependents,guests) => {
+  let totalCost='₹'+cost.toString();
   admin.database().ref('Tickets/'+userID+"/").push({
     cost : cost,
     date : date,
@@ -214,7 +255,7 @@ let insertTicket = (userID, arr, movieNmae, movietime, date, cost) => {
     userID : userID,
     seatsList : arr
 });
-admin.database().ref('Tickets/'+'A-007'+"/").push({
+admin.database().ref('Tickets/'+'S-2119'+"/").push({
   cost : cost,
   date : date,
   movieNmae : movieNmae,
@@ -224,26 +265,28 @@ admin.database().ref('Tickets/'+'A-007'+"/").push({
   userID : userID,
   seatsList : arr
 });
+
 admin.database().ref('Summary/'+date+'/'+userID+'/').set({
   date : date,
-  dependents : '0',
-  guest :'0',
-  member : '0',
+  dependents : dependents,
+  guest : guests,
+  member : member,
   movieName : movieNmae,
   rsiID : userID,
-  seats : 'Default',
-  time :movietime,
-  totalCost : cost,
-  typeOfTicket : 'Provisional'
-});//InComplete!!!
+  seats : seatValues,
+  time :movietime+" hr",
+  totalCost : totalCost,
+  typeOfTicket : 'Provisional Ticket'
+});
+
 }
 
 // ========================== Get Tickets =========================================
 
-let getTickets = (user) => {
-  console.log('in function');
+let getTickets = (user,arrSeats) => {
   let ticketArr = [];
-  let tickets = admin.database().ref('Tickets/' + user);
+  let map={};
+  let tickets = admin.database().ref('Tickets/' + user).orderByChild('date');
   return new Promise ((resolve, reject) => 
   {tickets.on('value', (snapshot) => {
     snapshot.forEach(childSnapshot => {
@@ -255,6 +298,7 @@ let getTickets = (user) => {
 
 // ========================== EXPORTS =============================================
 module.exports.idVerify = idVerify;
+module.exports.authMobUser = authMobUser;
 module.exports.authenticate = authenticate;
 module.exports.authMobNo = authMobNo;
 module.exports.updatePass = updatePass;
@@ -265,4 +309,3 @@ module.exports.bookTicket = bookTicket;
 module.exports.insertTicket = insertTicket;
 module.exports.getTickets = getTickets;
 module.exports.checkBooking = checkBooking;
-

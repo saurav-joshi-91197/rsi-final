@@ -3,7 +3,7 @@
 <html lang="en" >
 <head>
     <meta charset="utf-8" />
-    <title>seatLayout</title>
+    <title>RSI Pune</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
@@ -14,7 +14,7 @@
         }
 
         .seatStructure{
-            margin: auto;
+            margin-left: 80px;
         }
 
         td{
@@ -24,8 +24,8 @@
         }
 
         .seat {
-            height: 50px;
-            width: 50px;
+            height: 40px;
+            width: 40px;
             padding: 3px;
             cursor:pointer;
             background-color:#EAE7DC;
@@ -612,7 +612,7 @@
         </table>
     </div>
     <div>
-        <button class="butt1 bu1">Screen this way</button>
+        <button class="butt1 bu1">Screen This Way</button>
     </div>
     <script>
         
@@ -621,6 +621,63 @@
         var m;
         var sc = 0;
         var arr1=[];
+        //var arr2=[];
+        //var mapp = {};
+
+{{!-- var i;
+for(i=0; i<359; i++){
+    if(i>=0 && i<22){
+        mapp[i]='B'+(i+1);
+    }
+    else if(i>=22 && i<42){
+        mapp[i]='C'+(i-21);
+    }
+    else if(i>=42 && i<64){
+        mapp[i]='D'+(i-41);
+    }
+    else if(i>=64 && i<84){
+        mapp[i]='E'+(i-63);
+    }
+    else if(i>=84 && i<106){
+        mapp[i]='F'+(i-83);
+    }
+    else if(i>=106 && i<126){
+        mapp[i]='G'+(i-105);
+    }
+    else if(i>=126 && i<148){
+        mapp[i]='H'+(i-125);
+    }
+    else if(i>=148 && i<168){
+        mapp[i]='I'+(i-147);
+    }
+    else if(i>=168 && i<190){
+        mapp[i]='J'+(i-167);
+    }
+    else if(i>=190 && i<210){
+        mapp[i]='K'+(i-189);
+    }
+    else if(i>=210 && i<232){
+        mapp[i]='L'+(i-209);
+    }
+    else if(i>=232 && i<252){
+        mapp[i]='M'+(i-231);
+    }
+    else if(i>=252 && i<274){
+        mapp[i]='N'+(i-251);
+    }
+    else if(i>=274 && i<294){
+        mapp[i]='O'+(i-273);
+    }
+    else if(i>=294 && i<316){
+        mapp[i]='P'+(i-293);
+    }
+    else if(i>=316 && i<336){
+        mapp[i]='Q'+(i-315);
+    }
+    else if(i>=336 && i<358){
+        mapp[i]='R'+(i-335);
+    }
+} --}}
         var k;
         var h=0;
         for(k=0; k<358; k++){
@@ -722,6 +779,7 @@
             for(m=0; m<357; m++){
                 if(map[m]===1){
                     arr1[h] = m;
+                    //arr2[h]=mapp[m];
                     h=h+1;
                 }
             }
@@ -747,7 +805,7 @@
                 }
             }else{
                 alert('Select Correct Number of Seats!');
-                window.location.href = "/layout";
+                //window.location.href = "/layout";
             }
         }
         //window.alert(arr1);                      

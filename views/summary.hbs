@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>
+    RSI Pune
+  </title>
   <meta utf-8>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -82,10 +85,10 @@ tr:nth-child(even) {
     <td><p style="font-size:20px; font-weight: Bold;">RSI Id: {{rsiid}}</p></td>
   </tr>
   <tr>
-    <td><p style="font-size:20px; font-weight: Bold;">Seats: {{seats}}</p></td>
+    <td><p style="font-size:20px; font-weight: Bold;">Seats: [{{seats}}]</p></td>
   </tr>
   <tr>
-    <td><p style="font-size:20px; font-weight: Bold;">Total: {{price}}</p></td>
+    <td><p style="font-size:20px; font-weight: Bold;">Total: ₹{{price}}</p></td>
   </tr>
   <tr>
     <td><form action="/book" method="POST">

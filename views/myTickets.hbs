@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>qrcode</title>
+    <title>RSI Pune</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
@@ -11,7 +11,16 @@
 
   <script src="./qrcode.min.js"></script>
    
-  <body style="background-color:black;">
+  <body style="background-color:black;background-image:url('./bg2.jpg');">
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="deletebutton" style="margin-top:10px;margin-left:2%;width:140px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/deleteTicket'" type="button">DELETE TICKET</button>
+   {{/if_eq}} 
+  <button class="btn" id="homebutton" style="margin-top:10px;margin-left:1%;width:80px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/home'" type="button">HOME</button>
+  {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="summarybutton" style="margin-top:10px;margin-left:1%;width:115px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/deleteSummary'" type="button">SUMMARY</button>
+   {{/if_eq}} 
+    <div class="align">
+    <div class="row">
     {{#each ticketDetails}}
     <div class="container">
       <div class="card">   
@@ -25,18 +34,20 @@
                   
                   
                     <ul class="list">
-                      <li class="movname">{{movieNmae}}</li>
+                      <li class="movname">{{movieNmae}}{{rsiid}}</li>
                       <li>Date: {{date}}</li>
                       <li>Time: {{movietime}}</li>
                       <li>Seats: {{seatsList}}</li>
                       <li>RSAMI Id: {{userID}}</li>
-                      <li>Price: {{cost}}</li>
+                      <li>Price: ₹{{cost}}</li>
                       </ul>
                   
                </div>
       </div>
       </div>
     {{/each}}
+    </div>
+    </div>
   </body>
 
   <script>

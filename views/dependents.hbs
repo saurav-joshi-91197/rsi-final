@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>RSI</title>
+  <title>RSI Pune</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -9,7 +9,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </head>
-<body style="background-color:black;text-align:center">
+<body style="background-image:url('./bg2.jpg');text-align:center">
 
 <style>
 .size{
@@ -43,7 +43,11 @@
 .modal-body{
 	background-color: black;
 }
-
+.modal-footer
+{
+  padding-left: 40px;
+  background-color: goldenrod;
+}
 @media screen and (max-width=588px){
   .modal {
     -ms-transform: scale(0.5, 0.5); /* IE 9 */
@@ -54,9 +58,8 @@
 
 </style>
 <div class="container">
-  <h2 style="color:goldenrod;font-weight:bolder;" >TO GIVE THE DETAILS</h2>
   <!-- Trigger the modal with a button -->
-  <button id="modal" style="color:black; background-color:goldenrod;border-color:goldenrod;" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">CLICK ON THIS</button>
+  <button id="modal" style="color:black;font-weight:bolder;background-color:goldenrod;border-color:goldenrod;" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Click!</button>
 
   <!-- Modal -->
   <div  class="modal fade center  " id="myModal" role="dialog">
@@ -215,7 +218,6 @@ jQuery(function(){
            <p style="float: left;color:goldenrod;font-weight:bolder;font-size:21px;">Pricing:</p><br/><br/>
            <p style="float: left;color:white;font-size:20px;">Member/Dependent @ ₹{{Mp}}</p><br/><br/>
            <p style="float: left;color:white;font-size:20px;">Guest @ ₹{{Gp}}</p>
-          <button  style="background-color: goldenrod;color:black;font-weight:bolder;"type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
 

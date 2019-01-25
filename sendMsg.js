@@ -33,6 +33,7 @@ let sendOTP = (otp, mobNo) => {
 // ========================== Ticket Booking Confirmation =======================
 
 const sendBookingConfirmation = (rsiID, seats, movie, time, date, mobNo) => {
+  console.log("Sanjay");
   const msg_body = `Dear ${rsiID}, Seats : ${seats} confirmed for ${movie}. Show starts at ${time} hr on ${date}.`
   const msg = urlencode(msg_body);
 

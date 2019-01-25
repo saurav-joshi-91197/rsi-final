@@ -24,20 +24,12 @@
 <body>
 <div class="container">
   
-  <form class="form-horizontal" action="/adminUserDetails" method="post">
-    <h2 style="text-align: center;">Enter The Details Of User</h2>
-    <div class="message" style="margin-left:25%;font-size: 13px; color: red; font-weight: bolder;">{{messages}}</div>
+  <form class="form-horizontal" action="/deleteSummary" method="post">
+    <div style="font-size: 13px; color: red; font-weight: bolder;">{{messages}}</div>
     <div class="form-group">
-      <label class="control-label col-sm-2 col-lg-4" for="rsiid">RSI Id:</label>
+      <label class="control-label col-sm-2 col-lg-4" for="rsiid">Enter The Date :</label>
       <div class="col-sm-10 col-lg-4">          
-        <input type="text" class="form-control" id="rsiid" placeholder="X-1234" name="rsiid">
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label class="control-label col-sm-2 col-lg-4" for="newMob">Mobile Number:</label>
-      <div class="col-sm-10 col-lg-4">          
-        <input type="text" class="form-control" id="newMob" placeholder="1234567890" name="newMob">
+        <input type="text" class="form-control" id="rsiid" placeholder="DD-MM-YYYY" name="date">
       </div>
     </div>
     <div class="button">

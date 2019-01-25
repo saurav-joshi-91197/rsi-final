@@ -7,6 +7,7 @@ const app = express();
 const auth=require("./auth.js")
 const serviceAccount = require("./ss.json");
 const sendMsg = require('./sendMsg.js');
+const fs=require('fs');
 let otp,mob,user;
 
 function generateOTP() {
@@ -16,6 +17,12 @@ function generateOTP() {
       OTP += digits[Math.floor(Math.random() * 10)];
   }
   return OTP;
+}
+function nocache(req, res, next) {
+  res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header('Expires', '-1');
+  res.header('Pragma', 'no-cache');
+  next();
 }
 
 // ============================================= Flash ====================================
@@ -53,15 +60,16 @@ app.use(express.static('./public'));
 
 //===============================================GET=======================================
 
-app.get('/', function (req, res) {
+app.get('/',nocache, function (req, res) {
   res.render('idLogin.hbs', { messages: req.flash('invalidID') });
 });
 
-app.get('/requestOTP', (req, res)=>{
+app.get('/requestOTP',nocache, (req, res)=>{
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if(sess.rsiid||sess.rsiAdmin)
   {
@@ -73,12 +81,13 @@ app.get('/requestOTP', (req, res)=>{
   }
 });
 
-app.get('/home',function(req,res)
+app.get('/home',nocache,function(req,res)
 {
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
@@ -90,11 +99,13 @@ app.get('/home',function(req,res)
   }
 });
 
-app.get('/userLogin', (req, res) => {
+app.get('/userLogin',nocache, (req, res) => {
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin))
   {res.render('userLogin.hbs', {messages:req.flash('invalidUser')});}
@@ -102,12 +113,13 @@ app.get('/userLogin', (req, res) => {
   {res.redirect('/');}
 });
 
-app.get('/sendOTP', (req, res) => {
+app.get('/sendOTP',nocache, (req, res) => {
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
-  }
+    sess.rsiid='S-2119';
+  } 
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
     res.render('sendOTP.hbs', {messages: req.flash('invalidOTP')});
@@ -117,11 +129,12 @@ app.get('/sendOTP', (req, res) => {
   }
 });
 
-app.get('/changePassword', (req, res) => {
+app.get('/changePassword',nocache, (req, res) => {
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo && sess.otp)
   {
@@ -133,11 +146,12 @@ app.get('/changePassword', (req, res) => {
   }
 });
 
-app.get('/contact', (req, res) => {
+app.get('/contact',nocache, (req, res) => {
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
@@ -149,11 +163,12 @@ app.get('/contact', (req, res) => {
   }
 });
 
-app.get('/history', (req, res) => {
+app.get('/history',nocache, (req, res) => {
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
@@ -165,12 +180,13 @@ app.get('/history', (req, res) => {
   }
 });
 
-app.get('/addMovie',(req,res)=>
+app.get('/addMovie',nocache,(req,res)=>
 {
   sess=req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   if(sess.rsiAdmin&&sess.mobNo)
   {
-    res.render('addmovie.hbs');
+    res.sendFile(__dirname+'/views/addmovie.html');
   }
   else
   {
@@ -178,9 +194,10 @@ app.get('/addMovie',(req,res)=>
   }
 })
 
-app.get('/movieAdded',(req,res)=>
+app.get('/movieAdded',nocache,(req,res)=>
 {
   sess=req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   if(sess.rsiAdmin&&sess.mobNo)
   {
     res.redirect('/movies');
@@ -191,20 +208,32 @@ app.get('/movieAdded',(req,res)=>
   }
 })
 
-app.get('/deleteMovie',(req,res)=>
+app.get('/deleteMovie',nocache,(req,res)=>
 {
   movieKey=req.query.key;
-  console.log(movieKey);
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   var ref=admin.database().ref('Movies/'+movieKey).remove();
   res.redirect('/movies');
 })
 
-app.get('/adminBooking',(req,res)=>
+app.get('/deleteTicket',nocache,(req,res)=>
 {
   sess=req.session;
   if(sess.rsiAdmin&&sess.mobNo)
   {
-    res.render('adminBooking.hbs');
+    res.render('adminDelete.hbs');
+  }
+  else
+  {
+    res.redirect('/movies');
+  }
+})
+app.get('/deleteSummary',nocache,(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('deleteSummary.hbs');
   }
   else
   {
@@ -212,12 +241,27 @@ app.get('/adminBooking',(req,res)=>
   }
 })
 
-app.get('/adminVSuser',(req,res)=>
+
+app.get('/adminBooking',nocache,(req,res)=>
 {
   sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('adminBooking.hbs',{messages:req.flash('invalidUserOrMobile')});
+  }
+  else
+  {
+    res.redirect('/movies');
+  }
+})
+
+
+app.get('/adminVSuser',nocache,(req,res)=>
+{
+  sess=req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   sess.movieKey=req.query.key;
-  console.log("AdminVSUser :"+sess.rsiAdmin+" "+sess.mobNo+" "+sess.newMob+" "+sess.rsiid);
-  if(user==='A-007')
+  if(user==='S-2119')
   {
     res.redirect('/adminBooking');
   }
@@ -227,20 +271,23 @@ app.get('/adminVSuser',(req,res)=>
   }
 })
 
-app.get('/movies', (req, res) => {
+app.get('/movies',nocache, (req, res) => {
   sess = req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
   {
     auth.getMovies(sess.rsiid)
     .then((obj)=>
     {
+      //console.log(String(req.flash('movieBooked')));
       res.render('movie.hbs',{
         movieDetails : obj,
         adminId: sess.rsiAdmin
+        //messages :String(req.flash('movieBooked'))
       });
     },()=>
     {
@@ -253,15 +300,16 @@ app.get('/movies', (req, res) => {
   }
 });
 
-app.get('/dependents', (req, res) => {
+app.get('/dependents',nocache, (req, res) => {
   sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   auth.checkBooking(sess.rsiid,sess.movieKey)
   .then(()=>
   {
-    if(sess.rsiid && (sess.mobNo||sess.newMob)){
+    if(sess.rsiid && (sess.mobNo||sess.newMob)&& sess.movieKey){
       auth.getTotalPrice(sess.rsiid)
       .then((obj) => {
-        console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
+        //console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
         res.render('dependents.hbs', obj);
       }, () => {
         res.redirect('/movies');
@@ -279,17 +327,19 @@ app.get('/dependents', (req, res) => {
 
 });
 
-app.get('/myTickets', (req, res) => {
+app.get('/myTickets',nocache, (req, res) => {
   sess=req.session;
-  if(sess.rsiAdmin==='A-007')
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
   {
-    sess.rsiid='A-007';
+    sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
-  {auth.getTickets(sess.rsiid)
+  {auth.getTickets(sess.rsiid,sess.arrSeats)
   .then((ticketArr)=> {
     res.render('myTickets.hbs', {
-      ticketDetails: ticketArr
+      ticketDetails: ticketArr,
+      rsiid:sess.rsiid
     });
   },
    () => {
@@ -302,9 +352,9 @@ app.get('/myTickets', (req, res) => {
   }
 });
 
-app.get('/layout', (req, res) => {
-  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+app.get('/layout',nocache, (req, res) => {
   sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   if(sess.rsiid && (sess.mobNo||sess.newMob) && sess.movieKey)
   {
     res.render('seatlayout.hbs', {
@@ -319,67 +369,152 @@ app.get('/layout', (req, res) => {
   }
 });
 
-app.get('/summary', (req, res)=>{
+app.get('/summary',nocache, (req, res)=>{
   sess = req.session;
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   let seats = req.query.seats;
   let arrSeats = JSON.parse(decodeURI(seats)).arr1;
+
+var mapp = {};
+var i;
+for(i=0; i<359; i++){
+    if(i>=0 && i<22){
+        mapp[i]='B'+(i+1);
+    }
+    else if(i>=22 && i<42){
+        mapp[i]='C'+(i-21);
+    }
+    else if(i>=42 && i<64){
+        mapp[i]='D'+(i-41);
+    }
+    else if(i>=64 && i<84){
+        mapp[i]='E'+(i-63);
+    }
+    else if(i>=84 && i<106){
+        mapp[i]='F'+(i-83);
+    }
+    else if(i>=106 && i<126){
+        mapp[i]='G'+(i-105);
+    }
+    else if(i>=126 && i<148){
+        mapp[i]='H'+(i-125);
+    }
+    else if(i>=148 && i<168){
+        mapp[i]='I'+(i-147);
+    }
+    else if(i>=168 && i<190){
+        mapp[i]='J'+(i-167);
+    }
+    else if(i>=190 && i<210){
+        mapp[i]='K'+(i-189);
+    }
+    else if(i>=210 && i<232){
+        mapp[i]='L'+(i-209);
+    }
+    else if(i>=232 && i<252){
+        mapp[i]='M'+(i-231);
+    }
+    else if(i>=252 && i<274){
+        mapp[i]='N'+(i-251);
+    }
+    else if(i>=274 && i<294){
+        mapp[i]='O'+(i-273);
+    }
+    else if(i>=294 && i<316){
+        mapp[i]='P'+(i-293);
+    }
+    else if(i>=316 && i<336){
+        mapp[i]='Q'+(i-315);
+    }
+    else if(i>=336 && i<358){
+        mapp[i]='R'+(i-335);
+    }
+}
+
   let stringValues = [];
+  let stringInteger=[];
   for(let key1 in arrSeats){
-    stringValues.push(String(arrSeats[key1]));
+    stringValues.push(String(mapp[arrSeats[key1]]));
+    stringInteger.push(String(arrSeats[key1]));
   }
   let seatValues = "";
-  for(let key in arrSeats){
-    seatValues += arrSeats[key]+" ";
+  let seatInteger="";
+  let key=0;
+  for(key=0;key<arrSeats.length-1;key++){
+    seatValues += mapp[arrSeats[key]]+",";
+    seatInteger+=arrSeats[key]+",";
+
   }
-  sess.arrSeats=stringValues;
-  console.log(seatValues);
+
+  seatValues+=mapp[arrSeats[arrSeats.length-1]];
+  seatInteger+=arrSeats[arrSeats.length-1];
+
+  sess.arrSeats=stringInteger;
+  sess.seatInteger=seatInteger;
+  sess.seatValues=seatValues;
+
   if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
     auth.getSummary(sess.movieKey).then((details)=>{
       sess.movieName = details.name;
       sess.time = details.time;
       sess.date = details.date;
-    res.render('summary.hbs', {
+      res.render('summary.hbs', {
       rsiid: sess.rsiid,
       price: sess.totalPrice,
       movie: details.name,
       date: details.date,
       time: details.time,
-      seats: seatValues
+      seats: stringValues
       });
     },
     ()=>{console.log('In Reject Of Summary!!!');});
   }
   else
   {
-    res.redirect('/movies');
+    res.redirect('/home');
   }
 });
+
 
 app.get('/ticket', (req, res) => {
   sess = req.session;
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  sess.movieKey = undefined;
-  let seats = '';
-  for(let key in sess.arrSeats){
-    seats += sess.arrSeats[key]+" ";
-  }
-  sendMsg.sendBookingConfirmation(sess.rsiid, seats, sess.movieName, sess.time, sess.date, sess.mobNo);
   let ts = new Date().toLocaleString();
   console.log(ts);
+  if(sess.rsiid && sess.mobNo && sess.movieKey)
+  {
+  //console.log(sess.stringInteger);
+  sess.movieKey = undefined;
   res.render('qrcode.hbs', {
     movie: sess.movieName,
     date: sess.date,
     time: sess.time,
-    seats: seats,
+    seats: sess.arrSeats,
     rsiid: sess.rsiid,
     price: sess.totalPrice,
     seatList: sess.arrSeats
   });
+}
+  else
+  {
+    res.redirect('/');
+  }
 });
 
 app.get('/logout',function(req,res){
+  req.session.destroy(function(err) {
+    if(err) {
+      console.log(err);
+    } else {
+      res.redirect('/');
+    }
+  });
+});
+
+
+app.get('/logout',nocache,function(req,res){
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   req.session.destroy(function(err) {
     if(err) {
       console.log(err);
@@ -394,7 +529,7 @@ app.get('/logout',function(req,res){
 app.post('/phoneVerify', function (req, res) {
   let mobNo = req.body.mobNo;
   sess = req.session;
-  auth.authMobNo(ses.rsiid, mobNo)
+  auth.authMobNo(sess.rsiid, mobNo)
   .then(()=>{
     otp = generateOTP();
     sendMsg.sendOTP(otp, mobNo)
@@ -437,6 +572,10 @@ app.post('/OTPVerify', function (req, res) {
 });
 
 app.post('/idVerify',function(req,res){
+  sess = req.session;
+  sess.rsiAdmin=undefined;
+  sess.rsiid=undefined;
+  sess.mobNo=undefined;
   var field1=req.body.field1;
   var field2=req.body.field2;
   user=field1+'-'+field2;
@@ -444,9 +583,9 @@ app.post('/idVerify',function(req,res){
   sess = req.session;
   auth.idVerify(user)
   .then(()=>{
-    if(user==='A-007')
+    if(user==='S-2119')
     {
-      sess.rsiAdmin='A-007';
+      sess.rsiAdmin=user;
       sess.rsiid=user;
     }
     else
@@ -463,7 +602,7 @@ app.post('/idVerify',function(req,res){
 app.post('/userVerify',function(req,res){
   mobNo = req.body.mobNo;
   sess = req.session;
-	var password=req.body.rsipass;
+  var password=req.body.rsipass;
    auth.authenticate(sess.rsiid,mobNo,password)
    .then(()=>{
      sess.mobNo = mobNo;
@@ -502,6 +641,9 @@ app.post('/layout', (req, res)=>{
   sess = req.session;
   sess.totalPrice = parseInt(req.body.price);
   sess.totalSeats = req.body.seats;
+  sess.guests=req.body.guests;
+  sess.member=req.body.member;
+  sess.dependents=req.body.dependents;
   res.redirect('/layout');
 });
 
@@ -510,13 +652,64 @@ app.post('/adminUserDetails',(req,res)=>
   sess=req.session;
   sess.rsiid=req.body.rsiid;
   sess.newMob=req.body.newMob;
-  res.redirect('/dependents');
+  auth.authMobUser(sess.rsiid,sess.newMob)
+  .then(()=>{
+    res.redirect('/dependents');
+  },
+  ()=>{
+    req.flash('invalidUserOrMobile','Invalid User-Id Or Mobile!!!');
+    res.redirect('/adminBooking');
+  })
 })
+
+app.post('/adminDelete',(req,res)=>{
+  var date = req.body.date;
+  var ref = admin.database().ref('Tickets/');
+  ref.on('value',(snapshot)=>{
+    snapshot.forEach(childSnapshot =>{
+      var ref1 = admin.database().ref('Tickets/'+childSnapshot.key);
+      ref1.on('value',(snapshot1)=>{
+        snapshot1.forEach(childSnapshot1=>{
+          if(childSnapshot1.val().date===date){
+            admin.database().ref('Tickets/'+childSnapshot.key +'/'+ childSnapshot1.key).remove();
+          }
+        });
+      });   
+    });
+  });
+  res.redirect('/myTickets');
+});
+
+
+app.post('/deleteSummary',(req,res)=>{
+  var date = req.body.date;
+  var data = '';
+  data = data+'Date'+'\t'+'Movie Name'+'\t'+'RSI ID'+'\t'+'Seats'+'\t'+'Time'+'\t'+'Dependent(s)'+'\t'+'Guest(s)'+'\t'+'Member(s)'+'\t'+'Total Cost'+'\t'+'Type of Ticket'+'\n';
+  var ref = admin.database().ref('Summary/'+date);
+  ref.once('value',(snapshot)=>{
+      snapshot.forEach(childSnapshot =>{
+          data = data+childSnapshot.val().date+'\t'+childSnapshot.val().movieName+'\t'+childSnapshot.key+'\t'+childSnapshot.val().seats+'\t'+childSnapshot.val().time+'\t'+childSnapshot.val().dependents+'\t'+childSnapshot.val().guest+'\t'+childSnapshot.val().member+'\t'+childSnapshot.val().totalCost+'\t'+childSnapshot.val().typeOfTicket+'\n'; 
+      });
+      fs.appendFile(date+'.xls', data, (err) => {
+          if (err) throw err;
+          console.log('File created');
+      });
+  });
+  res.redirect('/myTickets');
+});
 
 app.post('/book', (req, res) => {
   sess = req.session;
-  auth.bookTicket(sess.arrSeats, sess.movieKey).then(()=>{res.redirect('/ticket')});
-  auth.insertTicket(sess.rsiid, sess.arrSeats, sess.movieName, sess.time, sess.date, sess.totalPrice);
+  if(sess.movieKey)
+  {
+    auth.bookTicket(sess.arrSeats, sess.movieKey).then(()=>{res.redirect('/ticket')});
+    auth.insertTicket(sess.rsiid, sess.arrSeats,sess.seatInteger,sess.seatValues, sess.movieName, sess.time, sess.date, sess.totalPrice,sess.member,sess.dependents,sess.guests);
+    sendMsg.sendBookingConfirmation(sess.rsiid, sess.seats, sess.movieName, sess.time, sess.date, sess.mobNo);
+  }
+  else
+  {
+    res.redirect('/home');
+  }
   });
 
 const server = app.listen(process.env.PORT || 5000);
