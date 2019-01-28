@@ -286,7 +286,8 @@ app.get('/movies',nocache, (req, res) => {
     {
       res.render('movie.hbs',{
         movieDetails : obj,
-        adminId: sess.rsiAdmin
+        adminId: sess.rsiAdmin,
+        messages : req.flash('movieBooked')
       });
     },()=>
     {
