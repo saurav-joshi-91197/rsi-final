@@ -243,7 +243,7 @@ let bookTicket = (arr, movieKey)=>{
 
 // ============================ Insert Ticket Data ================================
 
-let insertTicket = (userID, arr,seatInteger,seatValues, movieNmae, movietime, date, cost,member,dependents,guests) => {
+let insertTicket = (userID, arr,seatValues, movieNmae, movietime, date, cost,member,dependents,guests) => {
   let totalCost='₹'+cost.toString();
   admin.database().ref('Tickets/'+userID+"/").push({
     cost : cost,
@@ -283,17 +283,99 @@ admin.database().ref('Summary/'+date+'/'+userID+'/').set({
 
 // ========================== Get Tickets =========================================
 
-let getTickets = (user,arrSeats) => {
+let getTickets = (user) => {
   let ticketArr = [];
-  let map={};
-  let tickets = admin.database().ref('Tickets/' + user).orderByChild('date');
+  let seatsArr = [];
   return new Promise ((resolve, reject) => 
-  {tickets.on('value', (snapshot) => {
-    snapshot.forEach(childSnapshot => {
-      ticketArr.push(childSnapshot.val());
-    });
-    resolve(ticketArr);}
-  )});
+  { let tickets = admin.database().ref('Tickets/' + user).orderByChild('date');
+    tickets.on('value', (snapshot) => 
+    {
+    snapshot.forEach(childSnapshot =>
+    {
+      let map={};
+      map['cost']=childSnapshot.val().cost;
+      map['date']=childSnapshot.val().date;
+      map['movieNmae']=childSnapshot.val().movieNmae;
+      map['movietime']=childSnapshot.val().movietime;
+      map['provisional']=childSnapshot.val().provisional;
+      map['seatsList']=childSnapshot.val().seatsList;
+      map['timestamp']=childSnapshot.val().timestamp;
+      map['userID']=childSnapshot.val().userID;
+      
+      seatsArr=childSnapshot.val().seatsList;
+
+let seatsMap =[];
+var mapp = {};
+var i;
+for(i=0; i<359; i++){
+    if(i>=0 && i<22){
+        mapp[i]='B'+(i+1);
+    }
+    else if(i>=22 && i<42){
+        mapp[i]='C'+(i-21);
+    }
+    else if(i>=42 && i<64){
+        mapp[i]='D'+(i-41);
+    }
+    else if(i>=64 && i<84){
+        mapp[i]='E'+(i-63);
+    }
+    else if(i>=84 && i<106){
+        mapp[i]='F'+(i-83);
+    }
+    else if(i>=106 && i<126){
+        mapp[i]='G'+(i-105);
+    }
+    else if(i>=126 && i<148){
+        mapp[i]='H'+(i-125);
+    }
+    else if(i>=148 && i<168){
+        mapp[i]='I'+(i-147);
+    }
+    else if(i>=168 && i<190){
+        mapp[i]='J'+(i-167);
+    }
+    else if(i>=190 && i<210){
+        mapp[i]='K'+(i-189);
+    }
+    else if(i>=210 && i<232){
+        mapp[i]='L'+(i-209);
+    }
+    else if(i>=232 && i<252){
+        mapp[i]='M'+(i-231);
+    }
+    else if(i>=252 && i<274){
+        mapp[i]='N'+(i-251);
+    }
+    else if(i>=274 && i<294){
+        mapp[i]='O'+(i-273);
+    }
+    else if(i>=294 && i<316){
+        mapp[i]='P'+(i-293);
+    }
+    else if(i>=316 && i<336){
+        mapp[i]='Q'+(i-315);
+    }
+    else if(i>=336 && i<358){
+        mapp[i]='R'+(i-335);
+    }
+}
+
+for(let key in seatsArr)
+{
+  seatsMap.push(mapp[seatsArr[key]]);
+}
+
+
+      console.log(seatsArr); 
+      console.log(seatsMap);
+
+      map['seatsMap']=seatsMap;
+      ticketArr.push(map);
+    })
+      resolve(ticketArr);
+    });    
+  });
 }
 
 // ========================== EXPORTS =============================================

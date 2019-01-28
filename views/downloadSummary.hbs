@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+    <title>RSI Pune</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        .container{
+            margin-top: 10%;
+        }
+        .btn{
+            
+            
+            background-color: orange;
+        }
+        .button{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  
+  <form class="form-horizontal" action="/downloadSummary" method="post">
+    <div style="font-size: 13px; color: red; font-weight: bolder;">{{messages}}</div>
+    <div class="form-group">
+      <label class="control-label col-sm-2 col-lg-4" for="rsiid">Enter The Date :</label>
+      <div class="col-sm-10 col-lg-4">          
+        <input type="date" class="form-control" id="rsiid" placeholder="DD-MM-YYYY" name="date">
+      </div>
+    </div>
+    <div class="button">
+        <button type="submit" class="btn btn-default">Submit</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>

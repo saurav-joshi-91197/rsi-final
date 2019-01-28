@@ -8,6 +8,7 @@ const auth=require("./auth.js")
 const serviceAccount = require("./ss.json");
 const sendMsg = require('./sendMsg.js');
 const fs=require('fs');
+const NodeXls = require('node-xls');
 let otp,mob,user;
 
 function generateOTP() {
@@ -228,12 +229,12 @@ app.get('/deleteTicket',nocache,(req,res)=>
     res.redirect('/movies');
   }
 })
-app.get('/deleteSummary',nocache,(req,res)=>
+app.get('/downloadSummary',nocache,(req,res)=>
 {
   sess=req.session;
   if(sess.rsiAdmin&&sess.mobNo)
   {
-    res.render('deleteSummary.hbs');
+    res.render('downloadSummary.hbs');
   }
   else
   {
@@ -283,11 +284,9 @@ app.get('/movies',nocache, (req, res) => {
     auth.getMovies(sess.rsiid)
     .then((obj)=>
     {
-      //console.log(String(req.flash('movieBooked')));
       res.render('movie.hbs',{
         movieDetails : obj,
         adminId: sess.rsiAdmin
-        //messages :String(req.flash('movieBooked'))
       });
     },()=>
     {
@@ -303,13 +302,11 @@ app.get('/movies',nocache, (req, res) => {
 app.get('/dependents',nocache, (req, res) => {
   sess = req.session;
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  auth.checkBooking(sess.rsiid,sess.movieKey)
-  .then(()=>
+  if(sess.rsiAdmin==='S-2119')
   {
     if(sess.rsiid && (sess.mobNo||sess.newMob)&& sess.movieKey){
       auth.getTotalPrice(sess.rsiid)
       .then((obj) => {
-        //console.log(obj.Gp, obj.Mp, obj.Dp,obj.Dc);
         res.render('dependents.hbs', obj);
       }, () => {
         res.redirect('/movies');
@@ -318,13 +315,30 @@ app.get('/dependents',nocache, (req, res) => {
     else{
       res.redirect('/');
     }
-  },()=>
+  }
+  else
   {
-      console.log("Already Booked!!!");
-      req.flash('movieBooked', 'You Have Already Booked Tickets For This Movie!!!');
-      res.redirect('/movies');
-  })
-
+    auth.checkBooking(sess.rsiid,sess.movieKey)
+    .then(()=>
+    {
+      if(sess.rsiid && (sess.mobNo||sess.newMob)&& sess.movieKey){
+        auth.getTotalPrice(sess.rsiid)
+        .then((obj) => {
+          res.render('dependents.hbs', obj);
+        }, () => {
+          res.redirect('/movies');
+        });
+      }
+      else{
+        res.redirect('/');
+      }
+    },()=>
+    {
+        console.log("Already Booked!!!");
+        req.flash('movieBooked', 'You Have Already Booked Tickets For This Movie!!!');
+        res.redirect('/movies');
+    })
+}
 });
 
 app.get('/myTickets',nocache, (req, res) => {
@@ -335,7 +349,7 @@ app.get('/myTickets',nocache, (req, res) => {
     sess.rsiid='S-2119';
   }
   if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
-  {auth.getTickets(sess.rsiid,sess.arrSeats)
+  {auth.getTickets(sess.rsiid)
   .then((ticketArr)=> {
     res.render('myTickets.hbs', {
       ticketDetails: ticketArr,
@@ -357,7 +371,7 @@ app.get('/layout',nocache, (req, res) => {
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   if(sess.rsiid && (sess.mobNo||sess.newMob) && sess.movieKey)
   {
-    res.render('seatlayout.hbs', {
+      res.render('seatlayout.hbs', {
       rsiid: sess.rsiid,
       movieKey: sess.movieKey,
       totalSeats: sess.totalSeats
@@ -452,6 +466,7 @@ for(i=0; i<359; i++){
   sess.arrSeats=stringInteger;
   sess.seatInteger=seatInteger;
   sess.seatValues=seatValues;
+  sess.stringValues=stringValues;
 
   if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
@@ -484,7 +499,6 @@ app.get('/ticket', (req, res) => {
   console.log(ts);
   if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
-  //console.log(sess.stringInteger);
   sess.movieKey = undefined;
   res.render('qrcode.hbs', {
     movie: sess.movieName,
@@ -493,7 +507,7 @@ app.get('/ticket', (req, res) => {
     seats: sess.arrSeats,
     rsiid: sess.rsiid,
     price: sess.totalPrice,
-    seatList: sess.arrSeats
+    seatList: sess.stringValues
   });
 }
   else
@@ -501,17 +515,6 @@ app.get('/ticket', (req, res) => {
     res.redirect('/');
   }
 });
-
-app.get('/logout',function(req,res){
-  req.session.destroy(function(err) {
-    if(err) {
-      console.log(err);
-    } else {
-      res.redirect('/');
-    }
-  });
-});
-
 
 app.get('/logout',nocache,function(req,res){
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
@@ -681,21 +684,31 @@ app.post('/adminDelete',(req,res)=>{
 });
 
 
-app.post('/deleteSummary',(req,res)=>{
+app.post('/downloadSummary',(req,res)=>{
   var date = req.body.date;
-  var data = '';
-  data = data+'Date'+'\t'+'Movie Name'+'\t'+'RSI ID'+'\t'+'Seats'+'\t'+'Time'+'\t'+'Dependent(s)'+'\t'+'Guest(s)'+'\t'+'Member(s)'+'\t'+'Total Cost'+'\t'+'Type of Ticket'+'\n';
+  var data = [];
+  var tool = new NodeXls();
   var ref = admin.database().ref('Summary/'+date);
   ref.once('value',(snapshot)=>{
-      snapshot.forEach(childSnapshot =>{
-          data = data+childSnapshot.val().date+'\t'+childSnapshot.val().movieName+'\t'+childSnapshot.key+'\t'+childSnapshot.val().seats+'\t'+childSnapshot.val().time+'\t'+childSnapshot.val().dependents+'\t'+childSnapshot.val().guest+'\t'+childSnapshot.val().member+'\t'+childSnapshot.val().totalCost+'\t'+childSnapshot.val().typeOfTicket+'\n'; 
+      snapshot.forEach(childSnapshot => {
+          data.push({
+              Date : childSnapshot.val().date,
+              MovieName : childSnapshot.val().movieName,
+              RSIID : childSnapshot.val().rsiID,
+              Seats : childSnapshot.val().seats,
+              Time : childSnapshot.val().time,
+              Dependent : childSnapshot.val().dependents,
+              Guest : childSnapshot.val().guest,
+              Member : childSnapshot.val().member,
+              TotalCost : childSnapshot.val().totalCost,
+              TypeOfTicket : childSnapshot.val().typeOfTicket 
+          });
       });
-      fs.appendFile(date+'.xls', data, (err) => {
-          if (err) throw err;
-          console.log('File created');
-      });
-  });
-  res.redirect('/myTickets');
+      var xls = tool.json2xls(data, {order:["Date","MovieName","RSIID","Seats","Time","Dependent","Guest","Member","TotalCost","TypeOfTicket"], fieldMap:{MovieName: "Movie Name", RSIID : "RSI ID",Dependent:"Dependent(s)",Member:"Member(s)", Guest:"Guest(s)", TotalCost:"Total Cost", TypeOfTicket:"Type of Ticket"}});
+      fs.writeFileSync(date+'.xls',xls, 'binary');
+      res.download(date+'.xls');
+      res.redirect('/myTickets');
+  });    
 });
 
 app.post('/book', (req, res) => {
@@ -703,8 +716,16 @@ app.post('/book', (req, res) => {
   if(sess.movieKey)
   {
     auth.bookTicket(sess.arrSeats, sess.movieKey).then(()=>{res.redirect('/ticket')});
-    auth.insertTicket(sess.rsiid, sess.arrSeats,sess.seatInteger,sess.seatValues, sess.movieName, sess.time, sess.date, sess.totalPrice,sess.member,sess.dependents,sess.guests);
-    sendMsg.sendBookingConfirmation(sess.rsiid, sess.seats, sess.movieName, sess.time, sess.date, sess.mobNo);
+    auth.insertTicket(sess.rsiid, sess.arrSeats,sess.seatValues, sess.movieName, sess.time, sess.date, sess.totalPrice,sess.member,sess.dependents,sess.guests);
+    console.log(sess.rsiid+sess.newMob);
+    if(sess.rsiAdmin==='S-2119')
+    {
+      sendMsg.sendBookingConfirmation(sess.rsiid, sess.stringValues, sess.movieName, sess.time, sess.date, sess.newMob);
+    }
+    else
+    {
+      sendMsg.sendBookingConfirmation(sess.rsiid, sess.stringValues, sess.movieName, sess.time, sess.date, sess.mobNo);
+    }
   }
   else
   {
