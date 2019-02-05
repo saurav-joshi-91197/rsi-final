@@ -34,7 +34,11 @@ body {
   position: relative;
   border-style: none;
 }
-
+.fontsize
+{
+  font-size: 18px;
+  font-weight: bold;
+}
 .metadata {
   font-size: 16px;
 }
@@ -68,6 +72,7 @@ body {
 }
 .card-body .card-title {
   font-weight: 600;
+  font-size: 30px;
   color: #414345;
 }
 .card-body .card-text {
@@ -90,6 +95,7 @@ body {
 }
 
 .card {
+  height: 775px;
   border-radius: 8pt;
   border-style: none;
   overflow: hidden;

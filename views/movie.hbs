@@ -10,8 +10,6 @@
 </head>
 
 <body style="background-image:url('./bg1.jpg'); background-size:contain">
-  
-  
   <div class="align">
   <div class="row">
   {{#each movieDetails}} 
@@ -22,17 +20,24 @@
       </div>  
       <div class="card-body">
         <h1 class="card-title">{{name}}</h1>
-        <p class="language">Language: {{language}}{{messages}}</p>
-        <p class="date">Date: {{date}}</p>
-        <p class="duration">Duration: {{duration}}Hrs</p>
-        <p class="timing">Timing: {{timing}}Hrs</p>
+        <p class="timing fontsize">Certification: U/A</p>
+        <p class="language fontsize">Language: {{language}}{{messages}}</p>
+        <p class="date fontsize">Date: {{date}}</p>
+        <p class="duration fontsize">Duration: {{duration}}hr</p>
+        <p class="timing fontsize">Timing: {{timing}}hr</p>
         <a class="trailer-preview" href="/adminVSuser?key={{movieKey}}">
-            <i class="fa fa-play" aria-hidden="true"></i>
+         <i class="fa fa-play" aria-hidden="true"></i>
         </a>
       </div>
       {{#if_eq rsiid 'S-2119'}}
-        <button id="button" onclick="window.location.href='/deleteMovie?key={{movieKey}}'" type="button">
-         DELETE</button>
+        <button id="button" onclick="var r = confirm('Are You Sure You Want To Delete This Movie?');
+      if(r==true){
+        window.location.href='/deleteMovie?key={{movieKey}}';
+      }else{
+        window.location.href='/movies';
+      }"
+      type="button">
+      DELETE</button>
       {{/if_eq}}
   </div>
   </div>
@@ -44,6 +49,10 @@
        {{#if_eq adminId 'S-2119'}}
         <button id="button" class="pos btn" onclick="window.location.href='/addMovie'" type="button">
          ADD MOVIE</button>
+      {{/if_eq}}
+      {{#if_eq adminId 'S-2119'}}
+        <button id="button" class="pos btn" onclick="window.location.href='/home'" type="button">
+         HOME</button>
       {{/if_eq}}
     </div>
   </footer>

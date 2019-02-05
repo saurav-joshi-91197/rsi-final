@@ -11,7 +11,9 @@
         .container{
             margin-top: 10%;
         }
-        .btn{   
+        .btn{
+            
+            
             background-color: orange;
         }
         .button{
@@ -25,16 +27,15 @@
 </head>
 <body>
 <div class="container">
-  <h2 style="text-align: center;">Enter The Details</h2>
-  <form class="form-horizontal" action="/adminDelete" method="post">
-    <div style="font-size: 13px; color: blue; font-weight: bolder;text-align:center;">{{messages}}</div>
+    <h2 style="text-align: center;">Enter The Details Of User</h2>
+   <div style="font-size: 13px; color: blue; font-weight: bolder;text-align:center;">{{messages}}</div>
+   <form class="form-horizontal" action="/deleteUser" method="post">
     <div class="form-group">
-      <label class="control-label col-sm-2 col-lg-4" for="rsiid">Enter The Date :</label>
+      <label class="control-label col-sm-2 col-lg-4" for="rsiid">Enter RSI ID :</label>
       <div class="col-sm-10 col-lg-4">          
-        <input type="text" class="form-control" id="rsiid" placeholder="DD-MM-YYYY" name="date">
+        <input type="text" class="form-control" id="rsiid" placeholder="X-1234" name="rsiID">
       </div>
     </div>
-
 <div class="row">
         <div class="col-sm-5"></div>
         <div class="col-sm-2">
@@ -42,14 +43,11 @@
         <button type="submit" class=" button btn btn-default">Delete</button>
     </div>
     <div>
-        <button type="button" class="button btn btn-default" onclick="window.location.href='/myTickets'">Back</button>
+       <button type="button" class="button btn btn-default" onclick="window.location.href='/myTickets'">Back</button>
     </div>
         </div>
         <div class="col-sm-5"></div>
 </div>
-
-
-    
   </form>
 </div>
 </body>

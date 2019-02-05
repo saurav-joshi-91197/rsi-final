@@ -79,7 +79,7 @@ tr:nth-child(even) {
     <td><p style="font-size:20px; font-weight: Bold;">Date: {{date}}</p></td>
   </tr>
   <tr>
-    <td><p style="font-size:20px; font-weight: Bold;">Time: {{time}}</p></td>
+    <td><p style="font-size:20px; font-weight: Bold;">Time: {{time}}hr</p></td>
   </tr>
   <tr>
     <td><p style="font-size:20px; font-weight: Bold;">RSI Id: {{rsiid}}</p></td>
@@ -88,11 +88,11 @@ tr:nth-child(even) {
     <td><p style="font-size:20px; font-weight: Bold;">Seats: [{{seats}}]</p></td>
   </tr>
   <tr>
-    <td><p style="font-size:20px; font-weight: Bold;">Total: ₹{{price}}</p></td>
+    <td><p style="font-size:20px; font-weight: Bold;">Total: ₹ {{price}}</p></td>
   </tr>
   <tr>
     <td><form action="/book" method="POST">
-      <input class="button" type="submit" value="Book">
+      <input class="button" type="submit" value="BOOK">
     </form></td>
   </tr>  
 </table>

@@ -9,6 +9,11 @@
 
 
 }
+li
+{
+    font-weight: bolder;
+    font-size: 15px;
+}
 ul>li> a:hover > .glyphicon{
     color: orange;
 }

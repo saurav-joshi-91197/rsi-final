@@ -181,6 +181,125 @@ app.get('/history',nocache, (req, res) => {
   }
 });
 
+app.get('/sports',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/billiards.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
+app.get('/sanjog',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/sanjog.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
+app.get('/bar',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/bar.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
+app.get('/swimming',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/swimming.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
+app.get('/party',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/partyhall.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
+app.get('/trinco',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/trincorestuarent.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
+app.get('/guest',nocache, (req, res) => {
+  sess = req.session;
+  res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+  if(sess.rsiAdmin==='S-2119')
+  {
+    sess.rsiid='S-2119';
+  }
+  if((sess.rsiid||sess.rsiAdmin) && sess.mobNo)
+  {
+    res.sendFile(__dirname+'/public/guestroom.html');
+  }
+  else
+  {
+    res.redirect('/');
+  }
+});
+
 app.get('/addMovie',nocache,(req,res)=>
 {
   sess=req.session;
@@ -222,11 +341,11 @@ app.get('/deleteTicket',nocache,(req,res)=>
   sess=req.session;
   if(sess.rsiAdmin&&sess.mobNo)
   {
-    res.render('adminDelete.hbs');
+    res.render('adminDelete.hbs',{messages:req.flash('deleteTicket')});
   }
   else
   {
-    res.redirect('/movies');
+    res.redirect('/myTickets');
   }
 })
 app.get('/downloadSummary',nocache,(req,res)=>
@@ -234,11 +353,11 @@ app.get('/downloadSummary',nocache,(req,res)=>
   sess=req.session;
   if(sess.rsiAdmin&&sess.mobNo)
   {
-    res.render('downloadSummary.hbs');
+    res.render('downloadSummary.hbs',{messages:req.flash('summaryDownload')});
   }
   else
   {
-    res.redirect('/movies');
+    res.redirect('/myTickets');
   }
 })
 
@@ -246,13 +365,13 @@ app.get('/downloadSummary',nocache,(req,res)=>
 app.get('/adminBooking',nocache,(req,res)=>
 {
   sess=req.session;
-  if(sess.rsiAdmin&&sess.mobNo)
+  if(sess.rsiAdmin&&sess.mobNo&&sess.movieKey)
   {
     res.render('adminBooking.hbs',{messages:req.flash('invalidUserOrMobile')});
   }
   else
   {
-    res.redirect('/movies');
+    res.redirect('/home');
   }
 })
 
@@ -272,8 +391,75 @@ app.get('/adminVSuser',nocache,(req,res)=>
   }
 })
 
+app.get('/addUser',nocache,(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('adduser.hbs',{messages :req.flash('addUser')});
+  }
+  else
+  {
+    res.redirect('/myTickets');
+  }
+})
+
+app.get('/deleteUser',nocache,(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('deleteuser.hbs',{messages:req.flash('deleteUser')});
+  }
+  else
+  {
+    res.redirect('/myTickets');
+  }
+})
+
+app.get('/changeDependents',nocache,(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('changedependents.hbs',{messages:req.flash('depCountChanged')});
+  }
+  else
+  {
+    res.redirect('/myTickets');
+  }
+})
+
+app.get('/changePrices',nocache,(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('changeprices.hbs',{messages:req.flash('pricesChanged')});
+  }
+  else
+  {
+    res.redirect('/myTickets');
+  }
+})
+
+app.get('/changeMobileNumber',nocache,(req,res)=>
+{
+  sess=req.session;
+  if(sess.rsiAdmin&&sess.mobNo)
+  {
+    res.render('changemobilenumber.hbs',{messages:req.flash('numberChanged')});
+  }
+  else
+  {
+    res.redirect('/myTickets');
+  }
+})
+
+
 app.get('/movies',nocache, (req, res) => {
   sess = req.session;
+  sess.movieKey=undefined;
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   if(sess.rsiAdmin==='S-2119')
   {
@@ -303,27 +489,11 @@ app.get('/movies',nocache, (req, res) => {
 app.get('/dependents',nocache, (req, res) => {
   sess = req.session;
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
-  if(sess.rsiAdmin==='S-2119')
-  {
-    if(sess.rsiid && (sess.mobNo||sess.newMob)&& sess.movieKey){
-      auth.getTotalPrice(sess.rsiid)
-      .then((obj) => {
-        res.render('dependents.hbs', obj);
-      }, () => {
-        res.redirect('/movies');
-      });
-    }
-    else{
-      res.redirect('/');
-    }
-  }
-  else
-  {
-    auth.checkBooking(sess.rsiid,sess.movieKey)
+  auth.checkBooking(sess.rsiid,sess.movieKey)
     .then(()=>
     {
       if(sess.rsiid && (sess.mobNo||sess.newMob)&& sess.movieKey){
-        auth.getTotalPrice(sess.rsiid)
+        auth.getTotalPrice(sess.rsiid,sess.movieKey)
         .then((obj) => {
           res.render('dependents.hbs', obj);
         }, () => {
@@ -339,7 +509,6 @@ app.get('/dependents',nocache, (req, res) => {
         req.flash('movieBooked', 'You Have Already Booked Tickets For This Movie!!!');
         res.redirect('/movies');
     })
-}
 });
 
 app.get('/myTickets',nocache, (req, res) => {
@@ -497,7 +666,6 @@ app.get('/ticket', (req, res) => {
   sess = req.session;
   res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
   let ts = new Date().toLocaleString();
-  console.log(ts);
   if(sess.rsiid && sess.mobNo && sess.movieKey)
   {
   sess.movieKey = undefined;
@@ -656,7 +824,9 @@ app.post('/adminUserDetails',(req,res)=>
   sess=req.session;
   sess.rsiid=req.body.rsiid;
   sess.newMob=req.body.newMob;
-  auth.authMobUser(sess.rsiid,sess.newMob)
+  if(sess.rsiid&&sess.newMob)
+  {
+  auth.authMobNo(sess.rsiid,sess.newMob)
   .then(()=>{
     res.redirect('/dependents');
   },
@@ -664,6 +834,12 @@ app.post('/adminUserDetails',(req,res)=>
     req.flash('invalidUserOrMobile','Invalid User-Id Or Mobile!!!');
     res.redirect('/adminBooking');
   })
+}
+else
+{
+  req.flash('invalidUserOrMobile','Please Enter The Details!!!');
+  res.redirect('/adminBooking');
+}
 })
 
 app.post('/adminDelete',(req,res)=>{
@@ -681,7 +857,8 @@ app.post('/adminDelete',(req,res)=>{
       });   
     });
   });
-  res.redirect('/myTickets');
+  req.flash('deleteTicket','Ticket Deleted!!!');
+  res.redirect('/deleteTicket');
 });
 
 
@@ -708,9 +885,146 @@ app.post('/downloadSummary',(req,res)=>{
       var xls = tool.json2xls(data, {order:["Date","MovieName","RSIID","Seats","Time","Dependent","Guest","Member","TotalCost","TypeOfTicket"], fieldMap:{MovieName: "Movie Name", RSIID : "RSI ID",Dependent:"Dependent(s)",Member:"Member(s)", Guest:"Guest(s)", TotalCost:"Total Cost", TypeOfTicket:"Type of Ticket"}});
       fs.writeFileSync(date+'.xls',xls, 'binary');
       res.download(date+'.xls');
-      res.redirect('/myTickets');
   });    
 });
+
+app.post('/addUser',(req,res)=>
+{
+  var rsiID=req.body.rsiID;
+  var mobno=req.body.mobno;
+  var pass=req.body.pass;
+  let obj={};
+  obj['mobno']=mobno;
+  obj['pass']=pass;
+  obj['rsiID']=rsiID;
+  if(rsiID&&mobno&&pass)
+  {
+    admin.database().ref('UserSignIn/'+rsiID).set(obj);
+    req.flash('addUser','User Added!!!');
+    res.redirect('/addUser');
+  }
+  else
+  {
+    req.flash('addUser','Incomplete Details!!!');
+    res.redirect('/addUser');
+  }
+})
+
+app.post('/deleteUser',(req,res)=>
+{
+  var rsiID=req.body.rsiID;
+  auth.idVerify(rsiID)
+  .then(()=>
+  {
+    if(rsiID)
+    {
+      admin.database().ref('UserSignIn/'+rsiID).remove();
+      req.flash('deleteUser','User Deleted!!!');
+      res.redirect('/deleteUser');
+    }
+    else
+    {
+      req.flash('deleteUser','Invalid User!!!');
+      res.redirect('/deleteUser');
+    }
+  },
+  ()=>{
+    req.flash('deleteUser', 'Invalid RSI-ID! Please Try Again!');
+    res.redirect('/deleteUser');
+  });
+})
+
+app.post('/changePrices',(req,res)=>
+{
+  var guePrice = req.body.guestprice;
+  var memPrice  = req.body.memberprice;
+  var upiID = "9403107253@upi";
+  if(guePrice&&memPrice&&upiID)
+  {
+  admin.database().ref('Settings').set({
+    guePrice : guePrice,
+    memPrice : memPrice,
+    upiID : upiID
+  });
+  req.flash('pricesChanged',"Prices Changed Successfully!!!");
+  res.redirect('/changePrices');
+  }
+  else
+  {
+    req.flash('pricesChanged',"Please Enter All The Details!!!");
+    res.redirect('/changePrices');
+  }
+});
+
+app.post('/changeMobileNumber',(req,res)=>
+{
+  var rsiID = req.body.rsiID;
+  var mobno  = req.body.mobno;
+  var newmobno = req.body.newmobno;
+  if(rsiID&&mobno&&newmobno)
+  {
+    auth.changeMobNo(rsiID,mobno,newmobno)
+    .then(()=>
+    {
+      console.log("Resolve");
+      req.flash('numberChanged',"Mobile Number Changed Successfully!!!");
+      res.redirect('/changeMobileNumber');
+    },
+    ()=>
+    {
+      console.log("Reject");
+      req.flash('numberChanged',"Mobile Number Doesn't Match!!!");
+      res.redirect('/changeMobileNumber');
+    })
+  }
+  else
+  {
+    req.flash('numberChanged',"Please Enter All The Details!!!");
+    res.redirect('/changeMobileNumber');
+  }
+});
+
+app.post('/changeDependents', function(req,res){
+  let rsi;
+  let dep;
+
+  rsi= req.body.rsiid;
+  dep=req.body.depcount;
+  auth.idVerify(rsi)
+  .then(()=>
+  {
+    if(dep!=null)
+    {
+      var uid = admin.database().ref('DepCount/'+rsi);
+      uid.once('value',function(snapshot)
+      {
+      if(snapshot.hasChild('depCount'))
+      {
+        var db = admin.database();
+        db.ref('DepCount/'+rsi+'/'+'depCount/').set(dep);
+      }
+      else
+      {
+          admin.database().ref('DepCount/'+rsi).set({
+          depCount:dep,
+          rsiID:rsi
+        });
+      }
+      req.flash('depCountChanged','Dependents Count Changed Successfully!!!');
+      res.redirect("/changeDependents");
+      });
+    }
+    else
+    {
+      req.flash('depCountChanged','Please Enter Valid Dependent Count!!!');
+      res.redirect("/changeDependents");
+    }
+  },()=>
+  {
+    req.flash('depCountChanged','Invalid RSI-ID!!!');
+    res.redirect("/changeDependents");
+  })
+  });
 
 app.post('/book', (req, res) => {
   sess = req.session;
@@ -718,7 +1032,6 @@ app.post('/book', (req, res) => {
   {
     auth.bookTicket(sess.arrSeats, sess.movieKey).then(()=>{res.redirect('/ticket')});
     auth.insertTicket(sess.rsiid, sess.arrSeats,sess.seatValues, sess.movieName, sess.time, sess.date, sess.totalPrice,sess.member,sess.dependents,sess.guests);
-    console.log(sess.rsiid+sess.newMob);
     if(sess.rsiAdmin==='S-2119')
     {
       sendMsg.sendBookingConfirmation(sess.rsiid, sess.stringValues, sess.movieName, sess.time, sess.date, sess.newMob);

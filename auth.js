@@ -1,6 +1,7 @@
 var admin = require("firebase-admin");
 var serviceAccount = require("./ss.json");
 const dateTime = require('date-time');
+const secure = require('./encryption.js');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -18,57 +19,87 @@ const idVerify = (user, callback) => {
 });})}
 
 // ====================== mobNO and password Verification Promise =====================
-const authenticate = (user, mobile, pass) => {
-    var uid = admin.database().ref('UserSignIn/'+user);
-  console.log("User Is: "+user+mobile+" "+pass);
-  return new Promise( (resolve, reject) =>   
-{  uid.on('value',function(snapshot){
-    if(snapshot.val().mobno === mobile && snapshot.val().pass === pass){
-      resolve();
-    }else{
-      reject();
+
+const authenticate = (user, mobno, pass) => {
+  return new Promise((resolve, reject)=>{
+    let uid = admin.database().ref('UserSignIn/' + user).once('value');
+  uid.then((e) => {
+    return e.toJSON();
+  })
+  .then((data) => {
+    if(data.mobno.length < 15){
+      if(data.mobno === mobno && data.pass === pass)
+        {
+          let enc = [secure.encrypt(mobno), secure.encrypt(pass)];
+          Promise.all(enc)
+          .then((enc_data) => {
+            admin.database().ref('UserSignIn/' + user + '/mobno').set(enc_data[0])
+            .then(() => {
+              return admin.database().ref('UserSignIn/' + user + '/pass').set(enc_data[1]);
+            })
+            .then(() => {
+              resolve();
+            })
+            .catch((e) => {
+              console.log(e);
+              reject();
+            })
+          });
+        }
+      else 
+        console.log(false, 0);
+    }
+    else
+    {
+      let dec = [secure.decrypt(data.mobno), secure.decrypt(data.pass)];
+      Promise.all(dec)
+      .then((dec_data) => {
+        if(dec_data[0] === mobno && dec_data[1] === pass)
+          resolve();
+        else 
+          reject();
+      });    
     }
   });
-});
-}
-// ============================== mobNo Verification ===============================
-  const authMobNo = (user, mobile) => {
-    var uid = admin.database().ref('UserSignIn/'+user);
-    return new Promise ((resolve, reject) => {uid.on('value',function(snapshot){
-      if(snapshot.val().mobno === mobile){
-        resolve();     
-    }else{
-        reject(); 
-      }
-    });
   })
-  }
+}
 
-//=============================== mobNo And User Verification======================
-
-const authMobUser = (user, mobile) => {
-  var uid = admin.database().ref('UserSignIn/');
-  return new Promise ((resolve, reject) => {uid.on('value',function(snapshot){
-    uid.on('value',snapshot=>
-    {
-      snapshot.forEach(childSnapshot=>
-        {
-          ref=admin.database().ref('UserSignIn/'+user);
-          ref.on('value',snapshot=>
+// ============================== mobNo And User Verification ===============================
+const authMobNo = (user, mobile) => {
+  return new Promise((resolve, reject) => {
+    let mob = admin.database().ref('UserSignIn/' + user).once('value');
+    mob.then((o) => o.toJSON())
+    .then(data => {
+      if(data.mobno.length < 15)
+      {
+        if(mobile === data.mobno)
           {
-            if(snapshot.val().mobno===mobile)
-            {
-              resolve();
-            }
-            else
-            {
-              reject();
-            }
+          secure.encrypt(mobile)
+          .then((enc) => {
+            return admin.database().ref('UserSignIn/' + user + '/mobno').set(enc)
           })
+          .then(() => {resolve()}, () => {reject()})
+          .catch(e => {console.log(e)});
+          }
+        else
+        {
+          reject();
+        }
+      }
+      else
+      {
+        secure.decrypt(data.mobno)
+        .then((mobNo) => {
+          if(mobile === mobNo)
+          resolve();
+          else
+          reject();
         })
+        .catch(e => {console.log(e)});
+      }
     })
-  });
-})
+    .catch(e => {console.log(e)});
+  })
 }
 
 // ============================== Change Password =================================
@@ -78,22 +109,40 @@ const updatePass = (user, newPass, callback) => {
   callback('/home');
 }
 
+
+// ============================== Change Mobile Number ============================
+
+let changeMobNo = (user, mobile, newMobile) => {
+  return new Promise((resolve, reject) => {authMobNo(user, mobile)
+  .then(() => {
+    secure.encrypt(newMobile)
+    .then((enc) => {
+      return admin.database().ref('UserSignIn/'+user+'/mobno').set(enc);
+    })
+    .then(() => {resolve()}, ()=> {reject()})
+    .catch((e) => {console.log(e)});
+  },
+  () => {
+    reject();
+  })
+  .catch((e)=>{console.log(e)});})
+}
+
 // ========================= Get Total Price ======================================
-let getTotalPrice = (rsiId) => {
+let getTotalPrice = (rsiId,movieKey) => {
   let guestPrice;
   let membersPrice;
   let dependentPrice;
   let dependentCount=null;
-  let flag=0;
   let settings = admin.database().ref();
   return new Promise((resolve, reject) => {settings.on('value', function(snapshot)
   {
-    snapshot.forEach(childSnapshot=>
+      snapshot.forEach(childSnapshot=>
       {
         if(childSnapshot.key==='Settings')
         {
           var prices=admin.database().ref('Settings');
-          prices.on('value',snapshot=>
+          prices.once('value',snapshot=>
           {
             guestPrice=snapshot.val().guePrice;
             membersPrice=snapshot.val().memPrice;
@@ -104,48 +153,94 @@ let getTotalPrice = (rsiId) => {
         if(childSnapshot.key==='DepCount')
         {
           var DepCount=admin.database().ref('DepCount');
-          DepCount.on('value',snapshot=>
+          DepCount.once('value',snapshot=>
           {
             snapshot.forEach(childSnapshot=>
               {
                 if(childSnapshot.key===rsiId)
                 {
                   ref=admin.database().ref('DepCount/'+rsiId+'/depCount');
-                  ref.on('value',snapshot=>
+                  ref.once('value',snapshot=>
                   {
                     dependentCount=snapshot.val();
                   })
                 }
               })
-          })
-        }
+            })
+          }
       });
       if(dependentCount===null)
       {
         dependentCount=0;
       }
-      //console.log(dependentCount);
-      if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
+      console.log("Total_Prices :"+guestPrice+" "+membersPrice+" "+dependentPrice+" "+dependentCount);
+      var refff=admin.database().ref('Movies/'+movieKey+'/date');
+      refff.once('value',snapshot=>
       {
-        let obj = {
-          Gp: guestPrice,
-          Mp: membersPrice,
-          Dp: dependentPrice,
-          Dc: dependentCount
-        };
-        resolve(obj);
-      }
-      else
-      {
-        reject();
-      }
+        var date=snapshot.val();
 
-  }
-)})
+        var reffff=admin.database().ref('Summary/'+date);
+        reffff.once('value',snapshot1=>
+        {
+          if(snapshot1.hasChild(rsiId))
+          {
+            var refffff=admin.database().ref('Summary/'+date+'/'+rsiId);
+            refffff.once('value',snapshot2=>
+            {
+              console.log(snapshot2.val().guest+" "+snapshot2.val().member+"Sanjay");
+              if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
+              {
+              let obj = {
+                Gp: guestPrice,
+                Mp: membersPrice,
+                Dp: dependentPrice,
+                Dc: parseInt(snapshot2.val().dcount_lim)-dependentCount,
+                Gc :6-parseInt(snapshot2.val().guest),
+                Mc :1-parseInt(snapshot2.val().member),
+                fl : 1
+              };
+              console.log("HasChild");
+              console.log(obj);
+              resolve(obj); 
+            }
+            else
+            {
+              reject();
+            }  
+            })
+          }
+          else
+          {
+              if(guestPrice!=null && membersPrice!=null && dependentPrice!=null)
+              {
+                let obj = 
+                {
+                  Gp: guestPrice,
+                  Mp: membersPrice,
+                  Dp: dependentPrice,
+                  Dc: dependentCount,
+                  Gc :6,
+                  Mc :1,
+                  fl :0
+                };
+                console.log("Doesn't Has Child");
+                console.log(obj);
+                resolve(obj);
+              }
+              else
+              {
+                reject();
+              }
+          }
+        });
+      });
+  });
+});
 }
 
 let checkBooking = (rsiid, movieKey) => {
   var dateOfMovie,nameOfMovie;
+  console.log(movieKey);
   return new Promise((resolve,reject)=>
   {
     var ref = admin.database().ref('Movies/'+movieKey);
@@ -162,19 +257,36 @@ let checkBooking = (rsiid, movieKey) => {
             nameOfMovie=childSnapshot.val();
           }
         })
+        console.log(dateOfMovie);
+        var refff=admin.database().ref('Summary/'+dateOfMovie);
+        refff.once('value',snapshot=>
+        {
+              if(snapshot.hasChild(rsiid))
+              {
+                  var reffff=admin.database().ref('Summary/'+dateOfMovie+'/'+rsiid);
+                  reffff.once('value',snapshot=>
+                  {
+                    var dcount_lim=snapshot.val().dcount_lim;
+                    var dependents=snapshot.val().dependents;
+                    var member=snapshot.val().member;
+                    var guest=snapshot.val().guest;
+                    if(dcount_lim==dependents&&member==1&&guest==6)
+                    {
+                      //window.alert("Ticket Already Booked For This Movie!!!");
+                      reject();
+                    }
+                    else
+                    {
+                      resolve();
+                    }
 
-        var ref1 = admin.database().ref("Tickets/"+rsiid);
-        ref1.on('value',function(snapshot){
-          snapshot.forEach(childSnapshot=>{
-            var ref2 = admin.database().ref("Tickets/"+rsiid+"/"+childSnapshot.key);
-            ref2.on('value',function(snapshot){
-              if(snapshot.val().movieNmae===nameOfMovie && snapshot.val().date===dateOfMovie){
-                reject();
+                  })
               }
-              })
-            })
-            resolve();
-        })     
+              else
+              {
+                resolve();
+              }
+        })   
 })
 })
 }
@@ -244,7 +356,6 @@ let bookTicket = (arr, movieKey)=>{
 // ============================ Insert Ticket Data ================================
 
 let insertTicket = (userID, arr,seatValues, movieNmae, movietime, date, cost,member,dependents,guests) => {
-  let totalCost='₹'+cost.toString();
   admin.database().ref('Tickets/'+userID+"/").push({
     cost : cost,
     date : date,
@@ -266,19 +377,53 @@ admin.database().ref('Tickets/'+'S-2119'+"/").push({
   seatsList : arr
 });
 
-admin.database().ref('Summary/'+date+'/'+userID+'/').set({
-  date : date,
-  dependents : dependents,
-  guest : guests,
-  member : member,
-  movieName : movieNmae,
-  rsiID : userID,
-  seats : seatValues,
-  time :movietime+" hr",
-  totalCost : totalCost,
-  typeOfTicket : 'Provisional Ticket'
-});
 
+
+var ref = admin.database().ref('Summary/'+date);
+ref.once('value',(snapshot)=>{
+    if(snapshot.hasChild(userID)){
+        var reff = admin.database().ref('Summary/'+date+'/'+userID);
+        reff.once('value',snapshot=>{
+            var gst =snapshot.val().guest;
+            var mem = snapshot.val().member;
+            var dep = snapshot.val().dependents;
+            var tc = snapshot.val().totalCost;
+            var sts = snapshot.val().seats;
+            var dl=snapshot.val().dcount_lim;
+            admin.database().ref('Summary/'+date+'/'+userID).set({
+                date  :date,
+                dcount_lim :dl,
+                dependents :String(parseInt(dependents)+parseInt(dep)),
+                guest :String(parseInt(guests)+parseInt(gst)),
+                member :String(parseInt(member)+parseInt(mem)),
+                movieName :movieNmae,
+                rsiID :userID,
+                seats : seatValues+","+sts,
+                time : movietime+" hr",
+                totalCost : String(parseInt(cost)+parseInt(tc)),
+                typeOfTicket : 'Provisional Ticket'
+            });
+        });
+    }else{
+        var refff=admin.database().ref('DepCount/'+userID+'/depCount');
+        refff.once('value',snapshot=>
+        {
+          admin.database().ref('Summary/'+date+'/'+userID).set({
+            date  :date,
+            dcount_lim :snapshot.val(),
+            dependents :dependents,
+            guest :guests,
+            member :member,
+            movieName :movieNmae,
+            rsiID :userID,
+            seats : seatValues,
+            time : movietime+" hr",
+            totalCost : cost,
+            typeOfTicket : 'Provisional Ticket'
+        });
+        });
+    }
+});
 }
 
 // ========================== Get Tickets =========================================
@@ -365,11 +510,6 @@ for(let key in seatsArr)
 {
   seatsMap.push(mapp[seatsArr[key]]);
 }
-
-
-      console.log(seatsArr); 
-      console.log(seatsMap);
-
       map['seatsMap']=seatsMap;
       ticketArr.push(map);
     })
@@ -380,7 +520,6 @@ for(let key in seatsArr)
 
 // ========================== EXPORTS =============================================
 module.exports.idVerify = idVerify;
-module.exports.authMobUser = authMobUser;
 module.exports.authenticate = authenticate;
 module.exports.authMobNo = authMobNo;
 module.exports.updatePass = updatePass;
@@ -390,4 +529,5 @@ module.exports.getSummary = getSummary;
 module.exports.bookTicket = bookTicket;
 module.exports.insertTicket = insertTicket;
 module.exports.getTickets = getTickets;
+module.exports.changeMobNo = changeMobNo;
 module.exports.checkBooking = checkBooking;

@@ -7,6 +7,165 @@
   <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
   <link rel="stylesheet" href="./css/qrcode.css">
   </head>
+  <style>
+    .navBar {
+      display: block;
+    }
+
+    .menu {
+      border: 2px solid white;
+      width: 50px;
+    }
+
+    .items button {
+      display: block;
+      width: 100%;
+      background: rgb(43, 43, 42);
+      padding: 10px;
+      color: white;
+      border: none;
+      margin-bottom: 8px;
+    }
+
+    .hide-mobile {
+      display: none;
+    }
+
+    @media only screen and (min-width: 784px){
+      .hide-desktop {
+        display: none;
+      }
+
+      .hide-mobile {
+        display: block;
+      }
+
+      .items {
+        margin: 0;
+        padding: 0;
+      }
+
+      .items button {
+      display: inline;
+      width: 33%;
+      background: rgb(43, 42, 42);
+      padding: 10px;
+      color: white;
+      border: none;
+      margin-bottom: 8px;
+    }
+    }
+  </style>
+
+  <script src="./qrcode.min.js"></script>
+   
+  <body style="background-color:black;background-image:url('./bg2.jpg');">
+  <div class="navBar">
+  <img src="./menu1.png" class="menu hide-desktop" id="Menu" alt="hamburger">
+  <div id="Items" class="items show-desktop hide-mobile">
+ <button class="btn" id="homebutton" onclick="window.location.href='/home'" type="button">HOME</button>
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="summarybutton" onclick="window.location.href='/downloadSummary'" type="button">SUMMARY</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="deletebutton" onclick="window.location.href='/deleteTicket'" type="button">DELETE TICKET</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="adduser" onclick="window.location.href='/addUser'" type="button">ADD USER</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="deleteuser" onclick="window.location.href='/deleteUser'" type="button">DELETE USER</button>
+   {{/if_eq}}
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="changedependents" onclick="window.location.href='/changeDependents'" type="button">CHANGE DEPENDENTS</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="changeprices" onclick="window.location.href='/changePrices'" type="button">CHANGE PRICES</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="changemobilenumber" onclick="window.location.href='/changeMobileNumber'" type="button">CHANGE MOBILE NUMBER</button>
+   {{/if_eq}}
+   </div> 
+    </div>
+    <div class="align">
+    <div class="row">
+    {{#each ticketDetails}}
+    <div class="container">
+      <div class="card">   
+               <div class="card-header" >
+                <div class="qrcode" >
+                  <canvas class="canvas" id="{{@index}}"></canvas>
+                </div>
+                 
+               </div>
+               <div class="card-body" >
+                  
+                  
+               
+                    <ul class="list">
+                      <li class="movname">{{movieNmae}}</li>
+                      <li>Date: {{date}}</li>
+                      <li>Time: {{movietime}}hr</li>
+                      <li>Seats: {{seatsMap}}</li>
+                      <li>RSAMI Id: {{userID}}</li>
+                      <li>Price: ₹{{cost}}</li>
+                      </ul>
+               </div>
+      </div>
+      </div>
+    {{/each}}
+    </div>
+    </div>
+  </body>
+
+  <script>
+    let menu = document.getElementById('Menu');
+    let items = document.getElementById('Items');
+    
+    menu.addEventListener('click', () => {
+      event.preventDefault();
+      if(items.style.display === 'block')
+        items.style.display = 'none';
+      else
+        items.style.display = 'block';
+      
+    });
+  </script>
+
+  <script>
+    let jsObj;
+    let qrData;
+    {{#each ticketDetails}}
+    jsObj = {
+        Movietime: "{{movietime}}",
+        cost: {{cost}},
+        date: "{{date}}",
+        movieNmae: "{{movieNmae}}",
+        provisional: true,
+        seatsList: [{{seatsList}}],
+        timestamp: "{{timestamp}}",
+        userID: "{{userID}}"
+      };
+    qrData = JSON.stringify(jsObj);
+      QRCode.toCanvas(document.getElementById('{{@index}}'), qrData, function (error) {
+        if (error) console.error(error)
+        console.log('success!');
+      })
+    {{/each}}
+    </script>  
+</html>
+
+
+{{!-- 
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RSI Pune</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css'>
+  <link rel="stylesheet" href="./css/qrcode.css">
+  </head>
   
 
   <script src="./qrcode.min.js"></script>
@@ -18,6 +177,12 @@
   <button class="btn" id="homebutton" style="margin-top:10px;margin-left:1%;width:80px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/home'" type="button">HOME</button>
   {{#if_eq rsiid 'S-2119'}}
     <button class="btn" id="summarybutton" style="margin-top:10px;margin-left:1%;width:115px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/downloadSummary'" type="button">SUMMARY</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="adduser" style="margin-top:10px;margin-left:2%;width:140px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/addUser'" type="button">ADD USER</button>
+   {{/if_eq}} 
+   {{#if_eq rsiid 'S-2119'}}
+    <button class="btn" id="deleteuser" style="margin-top:10px;margin-left:2%;width:140px;height:40px;font-weight:bolder;background-color: aliceblue;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;" onclick="window.location.href='/deleteUser'" type="button">DELETE USER</button>
    {{/if_eq}} 
     <div class="align">
     <div class="row">
@@ -72,3 +237,4 @@
     {{/each}}
     </script>  
 </html>
+--}}

@@ -11,7 +11,9 @@
         .container{
             margin-top: 10%;
         }
-        .btn{   
+        .btn{
+            
+            
             background-color: orange;
         }
         .button{
@@ -21,35 +23,46 @@
             display:block;
             font-weight: bold;
         }
+        .row
+        {
+          margin-top: 2px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-  <h2 style="text-align: center;">Enter The Details</h2>
-  <form class="form-horizontal" action="/adminDelete" method="post">
+    <h2 style="text-align: center;">Enter The Details</h2>
     <div style="font-size: 13px; color: blue; font-weight: bolder;text-align:center;">{{messages}}</div>
+    <form class="form-horizontal" action="/changePrices" method="post">
     <div class="form-group">
-      <label class="control-label col-sm-2 col-lg-4" for="rsiid">Enter The Date :</label>
+    <div class="row">
+       <label class="control-label col-sm-2 col-lg-4">Enter Guest Price :</label>
       <div class="col-sm-10 col-lg-4">          
-        <input type="text" class="form-control" id="rsiid" placeholder="DD-MM-YYYY" name="date">
+        <input type="text" class="form-control" id="guestprice" placeholder="" name="guestprice">
       </div>
     </div>
 
-<div class="row">
-        <div class="col-sm-5"></div>
-        <div class="col-sm-2">
-            <div>
-        <button type="submit" class=" button btn btn-default">Delete</button>
-    </div>
-    <div>
-        <button type="button" class="button btn btn-default" onclick="window.location.href='/myTickets'">Back</button>
-    </div>
+    <div class="row">
+        <label class="control-label col-sm-2 col-lg-4">Enter Member Price :</label>
+        <div class="col-sm-10 col-lg-4">          
+            <input type="text" class="form-control" id="memberprice" placeholder="" name="memberprice">
         </div>
-        <div class="col-sm-5"></div>
+    </div>
+
+    </div>
+
+<div class="row">
+    <div class="col-sm-5"></div>
+    <div class="col-sm-2">
+        <div>
+            <button type="submit" class=" button btn btn-default">Submit</button>
+        </div>
+    <div>
+       <button type="button" class="button btn btn-default" onclick="window.location.href='/myTickets'">Back</button>
+    </div>
+    </div>
+    <div class="col-sm-5"></div>
 </div>
-
-
-    
   </form>
 </div>
 </body>
