@@ -1,5 +1,5 @@
 var admin = require("firebase-admin");
-var serviceAccount = require("./ss.json");
+var serviceAccount = require("[path to your service account file downloaded from firebase]");
 const dateTime = require('date-time');
 const secure = require('./encryption.js');
 
